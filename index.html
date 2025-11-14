@@ -1,19 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ECDSA Demo</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>ECDSA Signature Demo</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/elliptic@6.5.4/lib/elliptic.js"></script>
 </head>
+
 <body>
-    <h1>ECDSA Algorithm Demo</h1>
-    <div>
-        <label for="message">Enter message:</label>
-        <input type="text" id="message">
-        <button onclick="generateSignature()">Sign Message</button>
-    </div>
-    <div id="signature"></div>
+    <header>
+        <h1>Elliptic Curve Digital Signature Algorithm (ECDSA)</h1>
+        <p>Learn how the ECDSA algorithm works by signing a message with a private key and verifying it with the public key.</p>
+    </header>
+
+    <main>
+        <section>
+            <h2>Step 1: Enter a Message to Sign</h2>
+            <label for="message">Message:</label>
+            <input type="text" id="message" placeholder="Enter the message to sign" />
+            <button onclick="generateSignature()">Sign Message</button>
+        </section>
+
+        <section id="signatureSection">
+            <h2>Step 2: Signature</h2>
+            <p>Once you enter a message and click the button, the signature will appear here:</p>
+            <div id="signatureOutput"></div>
+        </section>
+
+        <section>
+            <h2>Step 3: Verify the Signature</h2>
+            <p>Enter the same message and signature to verify if the signature is valid for the given message:</p>
+            <label for="verifyMessage">Message:</label>
+            <input type="text" id="verifyMessage" placeholder="Enter the original message" />
+            <label for="verifySignature">Signature:</label>
+            <input type="text" id="verifySignature" placeholder="Enter the signature" />
+            <button onclick="verifySignature()">Verify Signature</button>
+            <div id="verificationResult"></div>
+        </section>
+    </main>
+
+    <footer>
+        <p>Made for educational purposes to demonstrate how ECDSA works. <a href="https://github.com/yourusername/ecdsa-project">GitHub Repository</a></p>
+    </footer>
+
     <script src="app.js"></script>
 </body>
+
 </html>
