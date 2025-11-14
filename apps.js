@@ -1,4 +1,4 @@
-// Create an elliptic curve object (using the SECP256k1 curve, commonly used for ECDSA)
+// Ensure elliptic.js is loaded correctly in the browser
 const EC = new elliptic.ec('secp256k1');
 
 // Generate a new key pair (public and private keys)
