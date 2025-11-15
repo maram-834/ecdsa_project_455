@@ -1,5 +1,5 @@
 // Initialize elliptic curve
-const EC = elliptic.ec;
+const EC = ellipticjs.ec;
 const ec = new EC("secp256k1");
 
 // Generate a fresh keypair once
