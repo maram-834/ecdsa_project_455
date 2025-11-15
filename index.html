@@ -5,48 +5,47 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ECDSA Signature Demo</title>
-    <link rel="stylesheet" href="style.css"> <!-- Correct path to style.css -->
-    <script src="https://cdn.jsdelivr.net/npm/elliptic@6.5.4/elliptic.min.js"></script> <!-- Correct elliptic.js CDN -->
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/elliptic@6.5.4/elliptic.min.js"></script>
 </head>
 
 <body>
     <header>
         <h1>Elliptic Curve Digital Signature Algorithm (ECDSA)</h1>
-        <p>Learn how the ECDSA algorithm works by signing a message with a private key and verifying it with the public key.</p>
+        <p>Sign a message with a private key and verify it with the public key.</p>
     </header>
 
     <main>
         <section>
-            <h2>Step 1: Enter a Message to Sign</h2>
+            <h2>Step 1: Enter a Message</h2>
             <label for="message">Message:</label>
-            <input type="text" id="message" placeholder="Enter the message to sign" />
+            <input type="text" id="message" placeholder="Enter a message">
             <button onclick="generateSignature()">Sign Message</button>
         </section>
 
-        <section id="signatureSection">
+        <section>
             <h2>Step 2: Signature</h2>
-            <p>Once you enter a message and click the button, the signature will appear here:</p>
             <div id="signatureOutput"></div>
         </section>
 
         <section>
-            <h2>Step 3: Verify the Signature</h2>
-            <p>Enter the same message and signature to verify if the signature is valid for the given message:</p>
+            <h2>Step 3: Verify</h2>
             <label for="verifyMessage">Message:</label>
-            <input type="text" id="verifyMessage" placeholder="Enter the original message" />
-            <label for="verifySignature">Signature:</label>
-            <input type="text" id="verifySignature" placeholder="Enter the signature" />
-            <button onclick="verifySignature()">Verify Signature</button>
+            <input type="text" id="verifyMessage">
+
+            <label for="verifySignature">Signature (r,s):</label>
+            <input type="text" id="verifySignature" placeholder="r,s">
+
+            <button onclick="verifySignature()">Verify</button>
             <div id="verificationResult"></div>
         </section>
     </main>
 
     <footer>
-        <p>Made for educational purposes to demonstrate how ECDSA works. <a href="https://github.com/yourusername/ecdsa-project">GitHub Repository</a></p>
+        <p>Educational ECDSA Demo</p>
     </footer>
 
-    <!-- Correct path to app.js -->
-    <script src="app.js"></script> 
+    <script src="app.js"></script>
 </body>
 
 </html>
