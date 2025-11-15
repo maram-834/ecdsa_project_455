@@ -1,52 +1,96 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ECDSA Signature Demo</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.jsdelivr.net/npm/elliptic@6.5.4/dist/elliptic.min.js"></script>
-    <script src="app.js"></script>
-</head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ECDSA Signature Demo — Professional</title>
 
+  <!-- Styles -->
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- elliptic library (must load BEFORE app.js) -->
+  <script src="https://cdn.jsdelivr.net/npm/elliptic@6.5.4/dist/elliptic.min.js" defer></script>
+  <!-- app logic (deferred) -->
+  <script src="app.js" defer></script>
+</head>
 <body>
-    <header>
-        <h1>Elliptic Curve Digital Signature Algorithm (ECDSA)</h1>
-        <p>Sign a message with a private key and verify it with the public key.</p>
+  <div class="container">
+    <header class="site-header">
+      <div class="brand">
+        <h1>ECDSA Signature Demo</h1>
+        <p class="tagline">Learn ECDSA with secp256k1 — generate keys, sign messages, and verify signatures.</p>
+      </div>
+      <div class="actions">
+        <button id="regenerateKeysBtn" class="btn secondary" title="Generate a new keypair">Regenerate Keypair</button>
+        <button id="copyPubKeyBtn" class="btn" title="Copy public key">Copy Public Key</button>
+      </div>
     </header>
 
     <main>
-        <section>
-            <h2>Step 1: Enter a Message</h2>
-            <label for="message">Message:</label>
-            <input type="text" id="message" placeholder="Enter a message">
-            <button onclick="generateSignature()">Sign Message</button>
-        </section>
+      <section class="card">
+        <h2>Key Information</h2>
+        <div class="field">
+          <label>Public key (hex)</label>
+          <textarea id="publicKey" readonly rows="2" aria-label="Public key"></textarea>
+        </div>
+        <div class="field small">
+          <label>Curve</label>
+          <div class="info">secp256k1</div>
+        </div>
+      </section>
 
-        <section>
-            <h2>Step 2: Signature</h2>
-            <div id="signatureOutput"></div>
-        </section>
+      <section class="card">
+        <h2>Sign a Message</h2>
+        <div class="field">
+          <label for="message">Message</label>
+          <input id="message" type="text" placeholder="Write a message to sign" aria-label="Message to sign" />
+        </div>
 
-        <section>
-            <h2>Step 3: Verify</h2>
-            <label for="verifyMessage">Message:</label>
-            <input type="text" id="verifyMessage">
+        <div class="row">
+          <button id="signBtn" class="btn">Sign Message</button>
+          <button id="copySigBtn" class="btn secondary" title="Copy signature">Copy Signature</button>
+        </div>
 
-            <label for="verifySignature">Signature (r,s):</label>
-            <input type="text" id="verifySignature" placeholder="r,s">
+        <div class="field">
+          <label>Signature (DER hex)</label>
+          <textarea id="signatureOutput" readonly rows="3" aria-label="Signature output"></textarea>
+        </div>
 
-            <button onclick="verifySignature()">Verify</button>
-            <div id="verificationResult"></div>
-        </section>
+        <div class="field small">
+          <label>Signature components (r / s)</label>
+          <div class="info" id="rsOutput">— / —</div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Verify a Signature</h2>
+
+        <div class="field">
+          <label for="verifyMessage">Message</label>
+          <input id="verifyMessage" type="text" placeholder="Message to verify" />
+        </div>
+
+        <div class="field">
+          <label for="verifySignature">Signature (DER hex)</label>
+          <textarea id="verifySignature" rows="3" placeholder="Paste signature DER hex or click 'Use last signature'"></textarea>
+        </div>
+
+        <div class="row">
+          <button id="useLastSigBtn" class="btn">Use last signature</button>
+          <button id="verifyBtn" class="btn primary">Verify Signature</button>
+        </div>
+
+        <div id="verificationResult" class="result" aria-live="polite">No verification yet.</div>
+      </section>
+
+      <footer class="card muted">
+        <small>
+          Educational demo · Uses <strong>secp256k1</strong> and SHA-256 · Not for production key management.
+          <span class="spacer"></span>
+          <a href="https://github.com/yourusername/ecdsa-project" target="_blank" rel="noopener">Repo</a>
+        </small>
+      </footer>
     </main>
-
-    <footer>
-        <p>Educational ECDSA Demo</p>
-    </footer>
-
-    <script src="app.js"></script>
+  </div>
 </body>
-
 </html>
