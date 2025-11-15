@@ -1,35 +1,68 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ECDSA Signature Generator</title>
-    <link rel="stylesheet" href="style.css">
 
-    <!-- Elliptic library -->
-    <script src="https://cdn.jsdelivr.net/npm/elliptic@6.5.4/dist/elliptic.min.js"></script>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ECDSA Signature Demo</title>
+    <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
-    <div class="container">
-        <h1>ECDSA Signature Generator</h1>
 
-        <label>Message:</label>
-        <textarea id="message" placeholder="Enter a message"></textarea>
+    <header>
+        <h1>Elliptic Curve Digital Signature Algorithm</h1>
+        <p>Generate and verify digital signatures using ECDSA (secp256k1)</p>
+    </header>
 
-        <button onclick="generateSignature()">Generate Signature</button>
+    <main class="container">
 
-        <h2>Your Keys</h2>
-        <p><strong>Private Key:</strong></p>
-        <textarea id="privateKey" readonly></textarea>
+        <section>
+            <h2>Generate Keys</h2>
+            <button onclick="generateKeys()">Generate New Key Pair</button>
 
-        <p><strong>Public Key:</strong></p>
-        <textarea id="publicKey" readonly></textarea>
+            <label>Private Key:</label>
+            <textarea id="privateKey" readonly></textarea>
 
-        <h2>Signature</h2>
-        <textarea id="signature" readonly></textarea>
-    </div>
+            <label>Public Key:</label>
+            <textarea id="publicKey" readonly></textarea>
+        </section>
 
+        <section>
+            <h2>Sign a Message</h2>
+
+            <label>Message:</label>
+            <textarea id="message" placeholder="Enter a message"></textarea>
+
+            <button onclick="generateSignature()">Sign Message</button>
+
+            <label>Signature (r,s):</label>
+            <textarea id="signature" readonly></textarea>
+        </section>
+
+        <section>
+            <h2>Verify Signature</h2>
+
+            <label>Message:</label>
+            <textarea id="verifyMessage"></textarea>
+
+            <label>Signature (r,s):</label>
+            <textarea id="verifySignature"></textarea>
+
+            <button onclick="verifySignature()">Verify</button>
+
+            <p id="verificationResult"></p>
+        </section>
+
+    </main>
+
+    <!-- LOAD LIBRARIES BEFORE app.js -->
+    <script src="https://cdn.jsdelivr.net/npm/elliptic@6.5.4/dist/elliptic.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+
+    <!-- YOUR SCRIPT (LOADS LAST) -->
     <script src="app.js"></script>
+
 </body>
+
 </html>
