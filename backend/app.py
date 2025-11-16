@@ -94,4 +94,6 @@ def verify_signature_route():
     return jsonify({'valid': is_valid, 'message': 'Signature is valid!' if is_valid else 'Signature is invalid!'})
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    import os
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
