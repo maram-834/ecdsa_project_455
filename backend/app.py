@@ -3,7 +3,12 @@ from ecdsa import SigningKey, NIST384p, util
 import hashlib
 import os
 
-app = Flask(__name__)
+app = Flask(
+    __name__,
+    template_folder=os.path.join(os.path.dirname(__file__), '..', 'templates'),
+    static_folder=os.path.join(os.path.dirname(__file__), '..', 'static')
+)
+
 
 # Global variables for private and public keys
 private_key = None
