@@ -1,5 +1,7 @@
 document.getElementById("generateKeys").addEventListener("click", function() {
-    fetch('/generate_keys')
+    const curve = window.location.pathname.split("/")[2];  // Detects the curve (p256, p384, p521)
+
+    fetch(`/generate_keys/${curve}`)
         .then(response => response.json())
         .then(data => {
             document.getElementById("keyStatus").textContent = data.message;
@@ -14,7 +16,9 @@ document.getElementById("signMessage").addEventListener("click", function() {
         return;
     }
 
-    fetch('/sign_message', {
+    const curve = window.location.pathname.split("/")[2];  // Detects the curve
+
+    fetch(`/sign_message/${curve}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message })
@@ -34,7 +38,9 @@ document.getElementById("verifySignature").addEventListener("click", function() 
         return;
     }
 
-    fetch('/verify_signature', {
+    const curve = window.location.pathname.split("/")[2];  // Detects the curve
+
+    fetch(`/verify_signature/${curve}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message, signature })

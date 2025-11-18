@@ -1,18 +1,22 @@
 /* General Styling */
 body {
-    font-family: 'Times New Roman', Times, serif;
+    font-family: Arial, Helvetica, sans-serif;
     margin: 0;
     padding: 20px;
-    background-color:aliceblue
+    background-color: rgb(255, 255, 255);
+    /*background: url("background.png") no-repeat center center fixed;
+    background-size: cover;
+    padding-bottom: 40px;
 }
 
 .container {
     width: 80%;
     margin: auto;
     padding: 20px;
-    background: rgba(255, 255, 255, 0.85); /* white transparent box */
+    background: rgba(255, 255, 255, 0.829); 
     border-radius: 10px;
-}
+}*/
+
 
 h1 {
     text-align: center;
@@ -20,13 +24,13 @@ h1 {
 
 /* Navigation Bar Styling */
 #navbar {
-    background-color: rgba(255, 255, 255, 0.85);
+    background-color: rgb(13, 127, 93);
     padding: 10px;
 }
 
 #navbar ul {
     list-style-type: none;
-    margin: 0;
+    margin: 10px;
     padding: 0;
     text-align: right;
 }
@@ -38,16 +42,18 @@ h1 {
 
 #navbar ul li a {
     text-decoration: none;
-    color: rgb(20, 20, 20);
+    color: rgb(255, 255, 255);
     font-size: 18px;
-    
 }
-
-
 
 /* Section Styling */
 section {
     margin-bottom: 30px;
+    width: 80%;
+    margin: auto;
+    padding: 20px;
+    background: rgb(224, 224, 224); 
+    border-radius: 10px;
 }
 
 textarea {
@@ -56,13 +62,13 @@ textarea {
     padding: 10px;
     margin: 10px 0;
     font-size: 16px;
-    border: 1px solid #ccc;
+    border: 1px solid #ffffff;
     border-radius: 5px;
 }
 
 button {
     padding: 10px 20px;
-    background-color: #fa00c0;
+    background-color: #000000;
     color: white;
     border: none;
     border-radius: 5px;
@@ -70,10 +76,91 @@ button {
 }
 
 button:hover {
-    background-color: #2980b9;
+    background-color: #000000;
 }
 
 p {
     font-size: 16px;
     color: #555;
+}
+
+/* Styling for the three boxes on the home page */
+.curve-boxes {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 30px;
+    margin-top: 50px;
+}
+
+.curve-box {
+    width: 400px;
+    background-color: rgb(255, 255, 255);
+    display: flex;
+    flex-direction: column; /* stack content vertically */
+    align-items: flex-start; /* align left */
+    font-size: 18px;
+    transition: background-color 0.3s, transform 0.3s;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+.curve-box:nth-child(3) {
+    margin-top: 20px;
+}
+/* Styling for the three boxes on the home page */
+.curve-boxes {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 30px;
+    margin-top: 50px;
+}
+
+.curve-box {
+    width: 400px;
+    background-color: rgb(255, 255, 255);
+    display: flex;
+    flex-direction: column; /* stack content vertically */
+    align-items: flex-start; /* align left */
+    font-size: 18px;
+    transition: background-color 0.3s, transform 0.3s;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+.curve-box:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+    transform: scale(1.05);
+}
+
+.curve-title {
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: #3498db;
+    text-decoration: none;
+    margin-bottom: 10px;
+    display: block; /* ensures it’s on its own line */
+}
+
+.curve-title:hover {
+    text-decoration: underline;
+}
+
+.curve-desc {
+    color: #333;
+    line-height: 1.5;
+}
+
+.curve-box a {
+    color: #333;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.curve-box a:hover {
+    color: #000000;
 }

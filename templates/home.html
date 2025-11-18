@@ -3,21 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
+    <title>ECDSA Digital Signature Tool</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
+    <!-- Navigation Bar -->
     <nav id="navbar">
         <ul>
-            <li><a href="/home">Home</a></li>
+            <li><a href="/">Home</a></li>
+            <li><a href="/p256">p-256 Curve</a></li>
+            <li><a href="/p384">p-384 Curve</a></li>
+            <li><a href="/p521">p-521 Curve</a></li>
             <li><a href="/about">About</a></li>
             <li><a href="/contact">Contact</a></li>
-            <li><a href="/">ECDSA Tool</a></li>
         </ul>
     </nav>
 
     <div class="container">
-        <h1>Hello, Welcome to the Home Page!</h1>
+        <h1>Welcome to the ECDSA Digital Signature Tool</h1>
+
+        <!-- Boxes for each curve -->
+        <div class="curve-boxes">
+            <div class="curve-box" id="p256-box">
+                <a href="/p256" class="curve-title">P-256 Curve</a>
+                <p class="curve-desc">
+                P-256 is the most widely used elliptic curve. It offers strong security while remaining very fast, making it ideal for websites, mobile apps, and general-purpose cryptography.
+                </p>
+            </div>
+
+            <div class="curve-box" id="p384-box">
+                <a href="/p384" class="curve-title">P-384 Curve</a>
+                <p class="curve-desc"> P-384 provides higher security than P-256. It is used when extra protection is required, such as government systems or long-term data security, while still maintaining good performance.
+                </p>
+            </div>
+            <div class="curve-box" id="p521-box">
+                <a href="/p521" class="curve-title">P-521 Curve</a>
+                <p class="curve-desc">
+                    P-521 offers the highest security level among the standard curves. It is chosen for highly sensitive environments where maximum cryptographic strength is more important than speed.
+                </p>
+            </div>
+        </div>
     </div>
+
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
 </body>
 </html>
