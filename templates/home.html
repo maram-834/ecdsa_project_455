@@ -12,8 +12,25 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: #ffffff;
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #1a0520 0%, #2d1040 50%, #1a0520 100%);
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(255, 105, 180, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 50%, rgba(186, 85, 211, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
         }
 
         nav {
@@ -21,8 +38,12 @@
             align-items: center;
             justify-content: space-between;
             padding: 1rem 3rem;
-            background: white;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            background: rgba(20, 10, 30, 0.95);
+            box-shadow: 0 4px 20px rgba(255, 105, 180, 0.3);
+            border-bottom: 2px solid rgba(255, 105, 180, 0.3);
+            backdrop-filter: blur(10px);
+            position: relative;
+            z-index: 100;
         }
 
         .logo {
@@ -30,7 +51,9 @@
             align-items: center;
             gap: 0.5rem;
             font-size: 1.25rem;
-            color: #0b5aa0;
+            color: #ff69b4;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(255, 105, 180, 0.5);
         }
 
         .logo-icon {
@@ -42,26 +65,30 @@
 
         .nav-links {
             display: flex;
-            gap: 2rem;
+            gap: 1.5rem;
             align-items: center;
             list-style: none;
         }
 
         .nav-links a {
             text-decoration: none;
-            color: #495057;
+            color: #ffc4e1;
             padding: 0.5rem 1.5rem;
             border-radius: 25px;
             transition: all 0.3s;
+            font-family: 'Georgia', serif;
         }
 
         .nav-links a.active {
-            background: #4a90e2;
+            background: linear-gradient(135deg, #ff69b4, #ba55d3);
             color: white;
+            box-shadow: 0 0 20px rgba(255, 105, 180, 0.5);
         }
 
         .nav-links a:hover:not(.active) {
-            color: #4a90e2;
+            background: rgba(255, 105, 180, 0.2);
+            color: #ff69b4;
+            box-shadow: 0 0 15px rgba(255, 105, 180, 0.3);
         }
 
         .nav-right {
@@ -75,26 +102,30 @@
             border: none;
             cursor: pointer;
             font-size: 1.25rem;
-            color: #495057;
+            color: #ffc4e1;
         }
 
         .user-name {
-            color: #495057;
+            color: #ffc4e1;
         }
 
         .contact-btn {
-            background: #4a90e2;
+            background: linear-gradient(135deg, #ff69b4, #ba55d3);
             color: white;
             border: none;
             padding: 0.75rem 2rem;
             border-radius: 25px;
             cursor: pointer;
             font-size: 1rem;
-            transition: background 0.3s;
+            transition: all 0.3s;
+            font-family: 'Georgia', serif;
+            box-shadow: 0 0 20px rgba(255, 105, 180, 0.4);
         }
 
         .contact-btn:hover {
-            background: #357abd;
+            background: linear-gradient(135deg, #ba55d3, #ff1493);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 30px rgba(255, 105, 180, 0.6);
         }
 
         .hero {
@@ -105,6 +136,8 @@
             max-width: 1400px;
             margin: 0 auto;
             gap: 4rem;
+            position: relative;
+            z-index: 1;
         }
 
         .hero-content {
@@ -115,17 +148,21 @@
         .hero-content h1 {
             font-size: 3.5rem;
             line-height: 1.2;
-            color: #212529;
+            color: #fff;
             margin-bottom: 1.5rem;
+            font-weight: normal;
+            text-shadow: 0 0 20px rgba(255, 105, 180, 0.5);
         }
 
         .hero-content h1 .highlight {
-            color: #1b508e;
+            color: #ff69b4;
+            font-style: italic;
+            text-shadow: 0 0 30px rgba(255, 105, 180, 0.8);
         }
 
         .hero-content p {
             font-size: 1.3rem;
-            color: #000000;
+            color: rgba(255, 200, 225, 0.95);
             line-height: 1.6;
         }
 
@@ -138,6 +175,9 @@
             width: 100%;
             height: auto;
             display: block;
+            border-radius: 12px;
+            box-shadow: 0 8px 40px rgba(255, 105, 180, 0.4);
+            border: 2px solid rgba(255, 105, 180, 0.3);
         }
 
         @media (max-width: 968px) {
@@ -167,14 +207,17 @@
             padding: 4rem 3rem;
             max-width: 1400px;
             margin: 0 auto;
+            position: relative;
+            z-index: 1;
         }
 
         .section-title {
             font-size: 3rem;
             text-align: center;
-            color: #212529;
+            color: #fff;
             margin-bottom: 3rem;
-            font-weight: 700;
+            font-weight: normal;
+            text-shadow: 0 0 20px rgba(255, 105, 180, 0.5);
         }
 
         .curves-grid {
@@ -184,20 +227,24 @@
         }
 
         .curve-card {
-            background: white;
-            border: 1px solid #e9ecef;
+            background: rgba(20, 10, 30, 0.8);
+            border: 2px solid rgba(255, 105, 180, 0.3);
             border-radius: 12px;
             padding: 2rem;
             text-decoration: none;
             color: inherit;
-            transition: transform 0.3s, box-shadow 0.3s;
+            transition: all 0.3s;
             display: flex;
             flex-direction: column;
+            box-shadow: 0 4px 20px rgba(255, 105, 180, 0.2);
+            backdrop-filter: blur(10px);
         }
 
         .curve-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            transform: translateY(-8px);
+            box-shadow: 0 12px 40px rgba(255, 105, 180, 0.5);
+            border-color: rgba(255, 105, 180, 0.6);
+            background: rgba(30, 15, 40, 0.9);
         }
 
         .curve-image {
@@ -207,9 +254,10 @@
             align-items: center;
             justify-content: center;
             margin-bottom: 1.35rem;
-            background: #f8f9fa;
+            background: linear-gradient(135deg, rgba(255, 105, 180, 0.1) 0%, rgba(186, 85, 211, 0.1) 100%);
             border-radius: 8px;
             overflow: hidden;
+            border: 1px solid rgba(255, 105, 180, 0.2);
         }
 
         .curve-image img {
@@ -220,41 +268,60 @@
 
         .curve-card h3 {
             font-size: 1.75rem;
-            color: #212529;
+            color: #ff69b4;
             margin-bottom: 1rem;
-            font-weight: 700;
+            font-weight: normal;
+            text-shadow: 0 0 10px rgba(255, 105, 180, 0.3);
         }
 
         .curve-card p {
             font-size: 1rem;
-            color: #6c757d;
+            color: #ffc4e1;
             line-height: 1.6;
+        }
+
+        /* Animated glow effect */
+        @keyframes glow {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        .curve-card::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #ff69b4, #ba55d3, #ff1493, #ff69b4);
+            border-radius: 12px;
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s;
+            background-size: 200% 200%;
+            animation: glow 3s ease-in-out infinite;
+        }
+
+        .curve-card:hover::before {
+            opacity: 0.3;
         }
     </style>
 </head>
 <body>
     <nav>
         <div class="logo">
-            <div class="logo-icon">
-                <img src="/static/ecc-logo.png" alt="Logo" class="logo-icon">
-            </div>
-            <span>ECDSA</span>
+            <span>🔐ECDSA</span>
         </div>
         
         <ul class="nav-links">
             <li><a href="/" class="active">Home</a></li>
+            <li><a href="/about">About</a></li>
+            <li><a href="/learn">Learn</a></li>
             <li><a href="p256">P-256</a></li>
             <li><a href="p384">P-384</a></li>
             <li><a href="p521">P-521</a></li>
             <li><a href="contact">Contact us</a></li>
         </ul>
-        
-        <div class="nav-right">
-            <button class="icon-btn">🛒</button>
-            <button class="icon-btn">🔍</button>
-            <span class="user-name">Maram Shatila ▼</span>
-            
-        </div>
     </nav>
 
     <section class="hero">
@@ -295,6 +362,6 @@
                 <p>P-521 offers the highest security level among the standard curves. It is chosen for highly sensitive environments where maximum cryptographic strength is more important than speed.</p>
             </a>
         </div>
-    </section
+    </section>
 </body>
 </html>

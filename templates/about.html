@@ -3,35 +3,656 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ECDSA Digital Signature Tool</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>About ECDSA - Elliptic Curve Digital Signature Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #1a0a10 0%, #2d1520 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        #animation-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 3rem;
+            background: rgba(255, 248, 250, 0.95);
+            box-shadow: 0 4px 20px rgba(100, 30, 50, 0.2);
+            border-bottom: 2px solid rgba(114, 47, 74, 0.2);
+            position: relative;
+            z-index: 10;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.25rem;
+            color: #722f4a;
+            font-weight: bold;
+        }
+
+        .logo-icon {
+            width: 35px;
+            height: 35px;
+            border-radius: 70%;
+            object-fit: fit;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #4a1a2a;
+            padding: 0.5rem 1.5rem;
+            border-radius: 25px;
+            transition: all 0.3s;
+            font-family: 'Georgia', serif;
+        }
+
+        .nav-links a.active {
+            background: linear-gradient(135deg, #722f4a, #4a1a2a);
+            color: white;
+        }
+
+        .nav-links a:hover:not(.active) {
+            background: rgba(114, 47, 74, 0.15);
+            color: #722f4a;
+        }
+
+        .main-content {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 3rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .welcome-section {
+            background: rgba(255, 248, 250, 0.95);
+            border-radius: 12px;
+            padding: 3rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 20px rgba(100, 30, 50, 0.15);
+            border: 2px solid rgba(114, 47, 74, 0.2);
+        }
+
+        .welcome-section h1 {
+            font-size: 2.5rem;
+            color: #241419;
+            margin-bottom: 1.5rem;
+            font-weight: normal;
+        }
+
+        .welcome-section > p {
+            font-size: 1.1rem;
+            color: #5a3040;
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+        }
+
+        .welcome-section ul {
+            list-style: none;
+            margin-bottom: 2rem;
+            padding-left: 1rem;
+        }
+
+        .welcome-section ul li {
+            font-size: 1.05rem;
+            color: #5a3040;
+            padding: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .welcome-section ul li::before {
+            content: "•";
+            color: #722f4a;
+            font-size: 1.5rem;
+            position: absolute;
+            left: 0;
+            top: 0.3rem;
+        }
+
+        .welcome-section ul li strong {
+            color: #4a1a2a;
+        }
+
+        .features-title {
+            font-size: 1.5rem;
+            color: #4a1a2a;
+            margin-bottom: 1rem;
+            font-weight: normal;
+        }
+
+        .features-list {
+            margin-bottom: 2rem;
+        }
+
+        .about-section {
+            background: rgba(255, 248, 250, 0.95);
+            border-radius: 12px;
+            padding: 3rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 20px rgba(100, 30, 50, 0.15);
+            border: 2px solid rgba(114, 47, 74, 0.2);
+        }
+
+        .about-section h2 {
+            font-size: 2rem;
+            color: #4a1a2a;
+            margin-bottom: 1.5rem;
+            font-weight: normal;
+        }
+
+        .about-section h3 {
+            font-size: 1.5rem;
+            color: #722f4a;
+            margin-bottom: 1rem;
+            font-weight: normal;
+        }
+
+        .about-section h4 {
+            font-size: 1.25rem;
+            color: #4a1a2a;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            font-weight: normal;
+        }
+
+        .about-section p {
+            font-size: 1.05rem;
+            color: #5a3040;
+            line-height: 1.8;
+            margin-bottom: 1rem;
+        }
+
+        .about-section ol {
+            padding-left: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .about-section ol li {
+            font-size: 1.05rem;
+            color: #5a3040;
+            padding: 0.5rem 0;
+            line-height: 1.6;
+        }
+
+        .about-section ol li strong {
+            color: #4a1a2a;
+        }
+
+        @media (max-width: 768px) {
+            nav {
+                padding: 1rem;
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+
+            .nav-links {
+                gap: 0.5rem;
+            }
+
+            .main-content {
+                padding: 1.5rem;
+            }
+
+            .welcome-section, .about-section {
+                padding: 1.5rem;
+            }
+        }
+    </style>
 </head>
 <body>
-    <nav id="navbar">
-        <ul>
+    <canvas id="animation-canvas"></canvas>
+
+    <nav>
+        <div class="logo">
+            
+            <span>🔐ECDSA</span>
+        </div>
+        
+        <ul class="nav-links">
             <li><a href="/">Home</a></li>
-            <li><a href="/p256">p-256 Curve</a></li>
-            <li><a href="/p384">p-384 Curve</a></li>
-            <li><a href="/p521">p-521 Curve</a></li>
-            <li><a href="/about">About</a></li>
-            <li><a href="/contact">Contact</a></li>
+            <li><a href="/about" class="active">About</a></li>
+            <li><a href="/learn">Learn</a></li>
+            <li><a href="/p256">P-256</a></li>
+            <li><a href="/p384">P-384</a></li>
+            <li><a href="/p521">P-521</a></li>
+            <li><a href="/contact">Contact us</a></li>
         </ul>
+        
+
     </nav>
 
-    <div class="container">
-        <h1>About ECDSA</h1>
-        <p>
-            The **Elliptic Curve Digital Signature Algorithm (ECDSA)** is a cryptographic algorithm used for digital signatures. It is based on elliptic curve mathematics and provides a secure way to authenticate and verify data.
-        </p>
-        <h2>About the Project</h2>
-        <p>
-            This project implements an ECDSA-based tool that allows users to:
+    <main class="main-content">
+        <!-- Welcome Section -->
+        <section class="welcome-section">
+            <h1>Welcome to ECDSA Cryptography</h1>
+            <p>This application demonstrates Elliptic Curve Digital Signature Algorithm (ECDSA) operations using three different NIST-standardized elliptic curves:</p>
+            
             <ul>
-                <li>Generate private and public keys</li>
-                <li>Sign messages using the private key</li>
-                <li>Verify the authenticity of signed messages using the public key</li>
+                <li><strong>P-256</strong> (secp256r1): 256-bit curve, widely used and efficient</li>
+                <li><strong>P-384</strong> (secp384r1): 384-bit curve, higher security level</li>
+                <li><strong>P-521</strong> (secp521r1): 521-bit curve, highest security level</li>
             </ul>
-        </p>
-    </div>
+
+            <h3 class="features-title">Features:</h3>
+            <ul class="features-list">
+                <li>Generate cryptographic key pairs</li>
+                <li>Sign messages with your private key</li>
+                <li>Verify signatures with the public key</li>
+            </ul>
+
+
+        </section>
+
+        <!-- About ECDSA Section -->
+        <section class="about-section">
+            <h2>About ECDSA</h2>
+            
+            <h3>Elliptic Curve Digital Signature Algorithm (ECDSA)</h3>
+            <p>ECDSA is a cryptographic algorithm used to ensure that data has not been tampered with and comes from a trusted source. It's based on elliptic curve cryptography (ECC), which offers strong security with smaller key sizes compared to traditional methods like RSA.</p>
+
+            <h4>How It Works:</h4>
+            <ol>
+                <li><strong>Key Generation:</strong> Creates a public-private key pair based on an elliptic curve</li>
+                <li><strong>Signing:</strong> Uses the private key to create a unique signature for a message</li>
+                <li><strong>Verification:</strong> Uses the public key to verify that a signature is valid</li>
+            </ol>
+
+        </section>
+    </main>
+
+    <script>
+        const canvas = document.getElementById('animation-canvas');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        // Digital Signature visualization
+        class DigitalSignature {
+            constructor() {
+                this.reset();
+            }
+
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.opacity = Math.random() * 0.4 + 0.2;
+                this.size = Math.random() * 60 + 40;
+                this.progress = 0;
+                this.speed = Math.random() * 0.01 + 0.005;
+                this.lifespan = 0;
+                this.maxLife = Math.random() * 400 + 300;
+            }
+
+            update() {
+                this.progress = Math.min(this.progress + this.speed, 1);
+                this.lifespan++;
+                if (this.lifespan > this.maxLife) {
+                    this.reset();
+                }
+            }
+
+            draw() {
+                const fadeOut = this.lifespan > this.maxLife - 60 ? (this.maxLife - this.lifespan) / 60 : 1;
+                const currentOpacity = this.opacity * fadeOut;
+
+                ctx.save();
+                ctx.translate(this.x, this.y);
+
+                // Document icon
+                ctx.strokeStyle = `rgba(200, 140, 165, ${currentOpacity})`;
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(-this.size * 0.3, -this.size * 0.4);
+                ctx.lineTo(-this.size * 0.3, this.size * 0.4);
+                ctx.lineTo(this.size * 0.3, this.size * 0.4);
+                ctx.lineTo(this.size * 0.3, -this.size * 0.25);
+                ctx.lineTo(this.size * 0.15, -this.size * 0.4);
+                ctx.closePath();
+                ctx.stroke();
+
+                // Folded corner
+                ctx.beginPath();
+                ctx.moveTo(this.size * 0.15, -this.size * 0.4);
+                ctx.lineTo(this.size * 0.15, -this.size * 0.25);
+                ctx.lineTo(this.size * 0.3, -this.size * 0.25);
+                ctx.stroke();
+
+                // Signature line
+                if (this.progress > 0.2) {
+                    const sigProgress = Math.min((this.progress - 0.2) / 0.6, 1);
+                    ctx.beginPath();
+                    ctx.strokeStyle = `rgba(220, 160, 185, ${currentOpacity})`;
+                    ctx.lineWidth = 2;
+                    
+                    // Wavy signature
+                    const startX = -this.size * 0.2;
+                    const endX = startX + (this.size * 0.4 * sigProgress);
+                    ctx.moveTo(startX, this.size * 0.2);
+                    for (let x = startX; x <= endX; x += 2) {
+                        const y = this.size * 0.2 + Math.sin((x - startX) * 0.3) * 5;
+                        ctx.lineTo(x, y);
+                    }
+                    ctx.stroke();
+                }
+
+                // Checkmark when complete
+                if (this.progress > 0.8) {
+                    const checkOpacity = (this.progress - 0.8) / 0.2;
+                    ctx.strokeStyle = `rgba(180, 220, 180, ${currentOpacity * checkOpacity})`;
+                    ctx.lineWidth = 3;
+                    ctx.beginPath();
+                    ctx.moveTo(this.size * 0.4, -this.size * 0.1);
+                    ctx.lineTo(this.size * 0.5, 0);
+                    ctx.lineTo(this.size * 0.7, -this.size * 0.2);
+                    ctx.stroke();
+                }
+
+                ctx.restore();
+            }
+        }
+
+        // Floating hash values
+        class HashValue {
+            constructor() {
+                this.reset();
+            }
+
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = -30;
+                this.speed = Math.random() * 1.2 + 0.5;
+                this.opacity = Math.random() * 0.5 + 0.25;
+                this.hash = this.generateHash();
+            }
+
+            generateHash() {
+                const chars = '0123456789abcdef';
+                let hash = '';
+                for (let i = 0; i < 8; i++) {
+                    hash += chars[Math.floor(Math.random() * chars.length)];
+                }
+                return hash;
+            }
+
+            update() {
+                this.y += this.speed;
+                if (this.y > canvas.height + 30) {
+                    this.reset();
+                }
+                if (Math.random() < 0.02) {
+                    this.hash = this.generateHash();
+                }
+            }
+
+            draw() {
+                ctx.font = 'bold 13px Courier New';
+                ctx.fillStyle = `rgba(200, 140, 165, ${this.opacity})`;
+                ctx.fillText(this.hash, this.x, this.y);
+            }
+        }
+
+        // Pen/writing tool
+        class WritingPen {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 20 + 15;
+                this.speedX = (Math.random() - 0.5) * 0.6;
+                this.speedY = (Math.random() - 0.5) * 0.6;
+                this.opacity = Math.random() * 0.45 + 0.2;
+                this.rotation = Math.random() * 0.5 + 0.3;
+            }
+
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+
+                if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+                if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+            }
+
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.rotation);
+                ctx.strokeStyle = `rgba(220, 160, 185, ${this.opacity})`;
+                ctx.lineWidth = 2;
+
+                // Pen body
+                ctx.beginPath();
+                ctx.moveTo(0, -this.size);
+                ctx.lineTo(-this.size * 0.15, this.size * 0.5);
+                ctx.lineTo(0, this.size * 0.4);
+                ctx.lineTo(this.size * 0.15, this.size * 0.5);
+                ctx.closePath();
+                ctx.stroke();
+
+                // Pen tip
+                ctx.beginPath();
+                ctx.moveTo(-this.size * 0.1, this.size * 0.5);
+                ctx.lineTo(0, this.size);
+                ctx.lineTo(this.size * 0.1, this.size * 0.5);
+                ctx.stroke();
+
+                ctx.restore();
+            }
+        }
+
+        // Verification shield
+        class VerifyShield {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 25 + 18;
+                this.speedX = (Math.random() - 0.5) * 0.4;
+                this.speedY = (Math.random() - 0.5) * 0.4;
+                this.opacity = Math.random() * 0.4 + 0.2;
+                this.pulse = 0;
+                this.pulseSpeed = Math.random() * 0.05 + 0.02;
+            }
+
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                this.pulse += this.pulseSpeed;
+
+                if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+                if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+            }
+
+            draw() {
+                const pulseScale = 1 + Math.sin(this.pulse) * 0.1;
+                const size = this.size * pulseScale;
+
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.strokeStyle = `rgba(200, 150, 170, ${this.opacity})`;
+                ctx.lineWidth = 2;
+
+                // Shield shape
+                ctx.beginPath();
+                ctx.moveTo(0, -size);
+                ctx.lineTo(size * 0.8, -size * 0.5);
+                ctx.lineTo(size * 0.8, size * 0.3);
+                ctx.quadraticCurveTo(size * 0.4, size, 0, size);
+                ctx.quadraticCurveTo(-size * 0.4, size, -size * 0.8, size * 0.3);
+                ctx.lineTo(-size * 0.8, -size * 0.5);
+                ctx.closePath();
+                ctx.stroke();
+
+                // Checkmark inside
+                ctx.strokeStyle = `rgba(180, 220, 180, ${this.opacity})`;
+                ctx.lineWidth = 2.5;
+                ctx.beginPath();
+                ctx.moveTo(-size * 0.3, 0);
+                ctx.lineTo(-size * 0.05, size * 0.3);
+                ctx.lineTo(size * 0.35, -size * 0.25);
+                ctx.stroke();
+
+                ctx.restore();
+            }
+        }
+
+        // Curved connecting lines
+        class CurveLine {
+            constructor() {
+                this.reset();
+            }
+
+            reset() {
+                this.startX = Math.random() * canvas.width;
+                this.startY = Math.random() * canvas.height;
+                this.endX = this.startX + (Math.random() - 0.5) * 300;
+                this.endY = this.startY + (Math.random() - 0.5) * 300;
+                this.controlX = (this.startX + this.endX) / 2 + (Math.random() - 0.5) * 100;
+                this.controlY = (this.startY + this.endY) / 2 + (Math.random() - 0.5) * 100;
+                this.progress = 0;
+                this.speed = Math.random() * 0.015 + 0.005;
+                this.opacity = Math.random() * 0.3 + 0.15;
+                this.lifespan = 0;
+                this.maxLife = Math.random() * 300 + 200;
+            }
+
+            update() {
+                this.progress = Math.min(this.progress + this.speed, 1);
+                this.lifespan++;
+                if (this.lifespan > this.maxLife) {
+                    this.reset();
+                }
+            }
+
+            draw() {
+                const fadeOut = this.lifespan > this.maxLife - 50 ? (this.maxLife - this.lifespan) / 50 : 1;
+                const currentOpacity = this.opacity * fadeOut;
+
+                ctx.strokeStyle = `rgba(180, 120, 145, ${currentOpacity})`;
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.moveTo(this.startX, this.startY);
+
+                // Draw curve up to current progress
+                const t = this.progress;
+                const x = (1-t)*(1-t)*this.startX + 2*(1-t)*t*this.controlX + t*t*this.endX;
+                const y = (1-t)*(1-t)*this.startY + 2*(1-t)*t*this.controlY + t*t*this.endY;
+                ctx.quadraticCurveTo(this.controlX, this.controlY, x, y);
+                ctx.stroke();
+
+                // Draw dots at endpoints
+                ctx.fillStyle = `rgba(220, 160, 185, ${currentOpacity})`;
+                ctx.beginPath();
+                ctx.arc(this.startX, this.startY, 4, 0, Math.PI * 2);
+                ctx.fill();
+
+                if (this.progress > 0.9) {
+                    ctx.beginPath();
+                    ctx.arc(this.endX, this.endY, 4, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+        }
+
+        // Initialize elements
+        const signatures = [];
+        for (let i = 0; i < 8; i++) {
+            const sig = new DigitalSignature();
+            sig.lifespan = Math.random() * sig.maxLife;
+            signatures.push(sig);
+        }
+
+        const hashes = [];
+        for (let i = 0; i < 20; i++) {
+            const hash = new HashValue();
+            hash.y = Math.random() * canvas.height;
+            hashes.push(hash);
+        }
+
+        const pens = [];
+        for (let i = 0; i < 10; i++) {
+            pens.push(new WritingPen());
+        }
+
+        const shields = [];
+        for (let i = 0; i < 12; i++) {
+            shields.push(new VerifyShield());
+        }
+
+        const curves = [];
+        for (let i = 0; i < 10; i++) {
+            const curve = new CurveLine();
+            curve.lifespan = Math.random() * curve.maxLife;
+            curves.push(curve);
+        }
+
+        function animate() {
+            ctx.fillStyle = 'rgba(26, 10, 16, 0.1)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Draw curves
+            curves.forEach(curve => {
+                curve.update();
+                curve.draw();
+            });
+
+            // Draw hashes
+            hashes.forEach(hash => {
+                hash.update();
+                hash.draw();
+            });
+
+            // Draw signatures
+            signatures.forEach(sig => {
+                sig.update();
+                sig.draw();
+            });
+
+            // Draw pens
+            pens.forEach(pen => {
+                pen.update();
+                pen.draw();
+            });
+
+            // Draw shields
+            shields.forEach(shield => {
+                shield.update();
+                shield.draw();
+            });
+
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
 </body>
 </html>

@@ -102,9 +102,6 @@ def about():
 @app.route('/contact')
 def contact():
     return render_template('contact.html')
-@app.route('/learn')
-def learn():
-    return render_template('learn.html')
 
 
 @app.route('/generate_keys/<curve>', methods=['GET'])
