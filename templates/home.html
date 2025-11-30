@@ -305,6 +305,211 @@
         .curve-card:hover::before {
             opacity: 0.3;
         }
+
+        /* Chatbot Styles */
+        .chat-widget {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 1000;
+        }
+
+        .chat-toggle {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff69b4, #ba55d3);
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(255, 105, 180, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            transition: all 0.3s;
+        }
+
+        .chat-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 30px rgba(255, 105, 180, 0.7);
+        }
+
+        .chat-box {
+            position: absolute;
+            bottom: 80px;
+            right: 0;
+            width: 380px;
+            height: 500px;
+            background: rgba(20, 10, 30, 0.98);
+            border: 2px solid rgba(255, 105, 180, 0.5);
+            border-radius: 16px;
+            box-shadow: 0 8px 40px rgba(255, 105, 180, 0.4);
+            backdrop-filter: blur(10px);
+            display: none;
+            flex-direction: column;
+        }
+
+        .chat-box.active {
+            display: flex;
+        }
+
+        .chat-header {
+            padding: 1.25rem;
+            background: linear-gradient(135deg, #ff69b4, #ba55d3);
+            border-radius: 14px 14px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-header h3 {
+            color: white;
+            font-size: 1.1rem;
+            font-weight: normal;
+        }
+
+        .chat-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .chat-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-messages::-webkit-scrollbar-track {
+            background: rgba(255, 105, 180, 0.1);
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: rgba(255, 105, 180, 0.5);
+            border-radius: 3px;
+        }
+
+        .message {
+            padding: 0.875rem 1rem;
+            border-radius: 12px;
+            max-width: 85%;
+            line-height: 1.5;
+        }
+
+        .message.bot {
+            background: rgba(255, 105, 180, 0.15);
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            color: #ffc4e1;
+            align-self: flex-start;
+        }
+
+        .message.user {
+            background: linear-gradient(135deg, #ff69b4, #ba55d3);
+            color: white;
+            align-self: flex-end;
+        }
+
+        .chat-input-area {
+            padding: 1rem;
+            border-top: 1px solid rgba(255, 105, 180, 0.3);
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 0.75rem;
+            background: rgba(255, 105, 180, 0.1);
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            border-radius: 8px;
+            color: #ffc4e1;
+            font-family: 'Georgia', serif;
+            font-size: 0.95rem;
+        }
+
+        .chat-input::placeholder {
+            color: rgba(255, 200, 225, 0.5);
+        }
+
+        .chat-input:focus {
+            outline: none;
+            border-color: #ff69b4;
+            box-shadow: 0 0 10px rgba(255, 105, 180, 0.3);
+        }
+
+        .chat-send {
+            padding: 0.75rem 1.25rem;
+            background: linear-gradient(135deg, #ff69b4, #ba55d3);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            font-family: 'Georgia', serif;
+            transition: all 0.3s;
+        }
+
+        .chat-send:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255, 105, 180, 0.5);
+        }
+
+        .chat-send:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .typing-indicator {
+            display: flex;
+            gap: 4px;
+            padding: 0.875rem 1rem;
+            background: rgba(255, 105, 180, 0.15);
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            border-radius: 12px;
+            width: fit-content;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: #ff69b4;
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% {
+                opacity: 0.3;
+                transform: translateY(0);
+            }
+            30% {
+                opacity: 1;
+                transform: translateY(-8px);
+            }
+        }
+        
     </style>
 </head>
 <body>
@@ -363,5 +568,197 @@
             </a>
         </div>
     </section>
+
+    <!-- Chat Widget -->
+    <div class="chat-widget">
+        <button class="chat-toggle" onclick="toggleChat()">💬</button>
+        <div class="chat-box" id="chatBox">
+            <div class="chat-header">
+                <h3>🔐 ECDSA Tutor</h3>
+                <button class="chat-close" onclick="toggleChat()">×</button>
+            </div>
+            <div class="chat-messages" id="chatMessages">
+                <div class="message bot">
+                    Hello! I'm your ECDSA tutor. Ask me anything about Elliptic Curve Digital Signature Algorithm, cryptography, or the curves (P-256, P-384, P-521)!
+                </div>
+            </div>
+            <div class="chat-input-area">
+                <input 
+                    type="text" 
+                    class="chat-input" 
+                    id="chatInput" 
+                    placeholder="Ask about ECDSA..."
+                    onkeypress="handleKeyPress(event)"
+                >
+                <button class="chat-send" onclick="sendMessage()" id="sendBtn">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ECDSA Knowledge Base
+        const ecdsaKnowledge = {
+            'what is ecdsa': 'ECDSA stands for Elliptic Curve Digital Signature Algorithm. It is a cryptographic algorithm used to create digital signatures, which verify the authenticity and integrity of digital messages or documents. ECDSA uses the mathematical properties of elliptic curves to provide security with smaller key sizes compared to traditional algorithms like RSA.',
+            
+            'how does ecdsa work': 'ECDSA works in three main steps: 1) Key Generation: A private key (random number) and public key (point on elliptic curve) are generated. 2) Signing: The sender uses their private key and a hash of the message to create a digital signature. 3) Verification: Anyone can use the sender\'s public key to verify the signature matches the message, proving it came from the private key holder without revealing the private key itself.',
+            
+            'what is elliptic curve': 'An elliptic curve is a mathematical curve defined by an equation like y² = x³ + ax + b. In cryptography, we use elliptic curves over finite fields. These curves have special properties that make them useful for cryptography: points on the curve can be "added" together, and this operation is easy to compute but very hard to reverse, providing the security foundation for ECDSA.',
+            
+            'p256': 'P-256 (also known as secp256r1 or prime256v1) is the most widely used elliptic curve. It provides approximately 128 bits of security and is standardized by NIST. P-256 is fast and secure, making it perfect for TLS/SSL, mobile apps, and general-purpose cryptography. It uses a 256-bit prime field.',
+            
+            'p384': 'P-384 (also known as secp384r1) provides approximately 192 bits of security. It offers higher security than P-256 and is used when extra protection is needed, such as in government systems or for long-term data security. P-384 uses a 384-bit prime field and is still reasonably fast while providing enhanced security margins.',
+            
+            'p521': 'P-521 (also known as secp521r1) offers the highest security level among standard NIST curves, providing approximately 256 bits of security. Despite the name, it uses a 521-bit prime field (not 512, which is chosen for mathematical optimization). P-521 is used in highly sensitive environments where maximum cryptographic strength is more important than performance.',
+            
+            'difference between curves': 'The main differences are security level and performance: P-256 (128-bit security, fastest), P-384 (192-bit security, moderate speed), and P-521 (256-bit security, slowest). Larger curves provide more security but require more computation. P-256 is sufficient for most applications, P-384 for high-security needs, and P-521 for maximum protection.',
+            
+            'why use ecdsa': 'ECDSA offers several advantages: 1) Smaller key sizes - 256-bit ECDSA provides similar security to 3072-bit RSA. 2) Faster computation - especially for signing operations. 3) Lower bandwidth - signatures and keys are smaller. 4) Strong security - based on well-studied mathematical problems. 5) Widely supported - used in Bitcoin, TLS, SSH, and many other protocols.',
+            
+            'digital signature': 'A digital signature is like a handwritten signature but for digital documents. It proves: 1) Authentication - the message came from the claimed sender. 2) Integrity - the message hasn\'t been altered. 3) Non-repudiation - the sender can\'t deny sending it. ECDSA creates digital signatures using elliptic curve mathematics.',
+            
+            'private key': 'A private key in ECDSA is a randomly generated secret number that must be kept confidential. It\'s used to create digital signatures. Anyone who possesses the private key can create valid signatures, so protecting it is crucial. The private key is mathematically related to the public key but cannot be derived from it.',
+            
+            'public key': 'A public key in ECDSA is a point on the elliptic curve that is derived from the private key. It can be freely shared and is used to verify signatures created by the corresponding private key. The public key cannot be used to determine the private key due to the mathematical difficulty of the elliptic curve discrete logarithm problem.',
+            
+            'signature verification': 'Signature verification is the process of checking if a digital signature is valid. Using the sender\'s public key, the message, and the signature, anyone can verify that: 1) The signature was created by someone with the private key. 2) The message hasn\'t been modified since signing. Verification doesn\'t reveal the private key.',
+            
+            'security': 'ECDSA security relies on the elliptic curve discrete logarithm problem (ECDLP), which is computationally infeasible to solve with current technology. The security level depends on the curve size: P-256 offers 128-bit security (secure for decades), P-384 offers 192-bit security, and P-521 offers 256-bit security (quantum-resistant for longer).',
+            
+            'applications': 'ECDSA is used extensively in: 1) Cryptocurrencies - Bitcoin and Ethereum use ECDSA for transaction signing. 2) TLS/SSL - securing website connections. 3) SSH - secure remote login. 4) Code signing - verifying software authenticity. 5) Digital certificates - PKI infrastructure. 6) Mobile apps - secure authentication.',
+            
+            'quantum': 'ECDSA is vulnerable to quantum computers running Shor\'s algorithm, which could break elliptic curve cryptography. However, quantum computers powerful enough don\'t exist yet. For quantum resistance, post-quantum cryptography algorithms are being developed. Current estimates suggest P-521 provides the longest security margin.',
+            
+            'key generation': 'ECDSA key generation involves: 1) Select an elliptic curve (like P-256). 2) Generate a random private key (a number between 1 and the curve order). 3) Compute the public key by multiplying the curve\'s base point by the private key. The randomness quality is crucial - weak random number generation can compromise security.',
+        };
+
+        function toggleChat() {
+            const chatBox = document.getElementById('chatBox');
+            chatBox.classList.toggle('active');
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        function findBestMatch(userMessage) {
+            const lowerMessage = userMessage.toLowerCase();
+            
+            // Direct keyword matching
+            for (const [key, value] of Object.entries(ecdsaKnowledge)) {
+                if (lowerMessage.includes(key) || key.includes(lowerMessage.substring(0, 15))) {
+                    return value;
+                }
+            }
+            
+            // Check for specific keywords
+            if (lowerMessage.includes('what') && lowerMessage.includes('ecdsa')) {
+                return ecdsaKnowledge['what is ecdsa'];
+            }
+            if (lowerMessage.includes('how') && lowerMessage.includes('work')) {
+                return ecdsaKnowledge['how does ecdsa work'];
+            }
+            if (lowerMessage.includes('256')) {
+                return ecdsaKnowledge['p256'];
+            }
+            if (lowerMessage.includes('384')) {
+                return ecdsaKnowledge['p384'];
+            }
+            if (lowerMessage.includes('521')) {
+                return ecdsaKnowledge['p521'];
+            }
+            if (lowerMessage.includes('difference') || lowerMessage.includes('compare')) {
+                return ecdsaKnowledge['difference between curves'];
+            }
+            if (lowerMessage.includes('why') || lowerMessage.includes('advantage')) {
+                return ecdsaKnowledge['why use ecdsa'];
+            }
+            if (lowerMessage.includes('private key')) {
+                return ecdsaKnowledge['private key'];
+            }
+            if (lowerMessage.includes('public key')) {
+                return ecdsaKnowledge['public key'];
+            }
+            if (lowerMessage.includes('signature')) {
+                return ecdsaKnowledge['digital signature'];
+            }
+            if (lowerMessage.includes('verify') || lowerMessage.includes('verification')) {
+                return ecdsaKnowledge['signature verification'];
+            }
+            if (lowerMessage.includes('secure') || lowerMessage.includes('security')) {
+                return ecdsaKnowledge['security'];
+            }
+            if (lowerMessage.includes('application') || lowerMessage.includes('use case')) {
+                return ecdsaKnowledge['applications'];
+            }
+            if (lowerMessage.includes('quantum')) {
+                return ecdsaKnowledge['quantum'];
+            }
+            if (lowerMessage.includes('generate') || lowerMessage.includes('generation')) {
+                return ecdsaKnowledge['key generation'];
+            }
+            if (lowerMessage.includes('curve') && !lowerMessage.includes('p-')) {
+                return ecdsaKnowledge['what is elliptic curve'];
+            }
+            
+            return null;
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const messagesContainer = document.getElementById('chatMessages');
+            const sendBtn = document.getElementById('sendBtn');
+            const message = input.value.trim();
+
+            if (!message) return;
+
+            // Add user message
+            const userMsg = document.createElement('div');
+            userMsg.className = 'message user';
+            userMsg.textContent = message;
+            messagesContainer.appendChild(userMsg);
+
+            // Clear input and disable button
+            input.value = '';
+            sendBtn.disabled = true;
+
+            // Show typing indicator
+            const typingIndicator = document.createElement('div');
+            typingIndicator.className = 'typing-indicator';
+            typingIndicator.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
+            messagesContainer.appendChild(typingIndicator);
+
+            // Scroll to bottom
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            // Simulate thinking delay
+            setTimeout(() => {
+                // Remove typing indicator
+                typingIndicator.remove();
+
+                // Find best matching response
+                const response = findBestMatch(message);
+                
+                // Add bot response
+                const botMsg = document.createElement('div');
+                botMsg.className = 'message bot';
+                
+                if (response) {
+                    botMsg.textContent = response;
+                } else {
+                    botMsg.textContent = 'I can help you with questions about ECDSA, elliptic curves (P-256, P-384, P-521), digital signatures, keys, security, and more. Try asking "What is ECDSA?" or "How does P-256 compare to P-384?"';
+                }
+                
+                messagesContainer.appendChild(botMsg);
+
+                // Re-enable button
+                sendBtn.disabled = false;
+                
+                // Scroll to bottom
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }, 800);
+        }
+    </script>
 </body>
 </html>
