@@ -1,0 +1,11 @@
+import ecdsa
+
+private_key = "f9e6a7cb98b65206b21ddf094e0b0994d4ca79f1db769ef6b83dd2a513d69ffe"
+message = "Hello world!"
+sk = ecdsa.SigningKey.from_string(bytes.fromhex(private_key), curve=ecdsa.SECP256k1)
+
+public_key = sk.get_verifying_key() 
+message_bytes = str.encode(message)
+sig = sk.sign(message_bytes, hashfunc=sha256)
+print(f"Public key: {public_key.to_string().hex()}")
+print(f"Signature : {sig.hex()}")

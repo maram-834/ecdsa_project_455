@@ -3,321 +3,801 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ECDSA P-521 Curve</title>
+    <title>P-521 ECDSA - Elliptic Curve Signatures</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Georgia', serif; overflow-x: hidden; background: linear-gradient(135deg, #150810 0%, #2a1018 100%); }
+        #encryption-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
+        .content { position: relative; z-index: 1; min-height: 100vh; padding: 10px 20px 40px 20px; color: #2c2024; }
+        .container { max-width: 1000px; margin: 0 auto; padding: 40px; }
+        h1 { text-align: center; margin-bottom: 30px; font-size: 2.5em; color: #4a1a2a; letter-spacing: 2px; background: rgba(255, 248, 250, 0.95); padding: 25px; border-radius: 12px; box-shadow: 0 4px 30px rgba(100, 30, 50, 0.3); border: 2px solid rgba(100, 30, 50, 0.25); font-weight: normal; }
+        h2 { color: #4a1a2a; font-size: 1.3em; margin-bottom: 15px; font-weight: normal; }
+        .key-section { margin: 30px 0; padding: 25px; background: rgba(255, 248, 250, 0.93); border-left: 4px solid #722f4a; border-radius: 8px; backdrop-filter: blur(10px); box-shadow: 0 4px 20px rgba(100, 30, 50, 0.15); }
+        button { background: linear-gradient(135deg, #722f4a, #4a1a2a); color: #fff; border: none; padding: 15px 30px; font-size: 16px; font-weight: bold; border-radius: 8px; cursor: pointer; transition: all 0.3s ease; font-family: 'Georgia', serif; letter-spacing: 1px; }
+        button:hover { transform: translateY(-2px); box-shadow: 0 5px 30px rgba(114, 47, 74, 0.5); background: linear-gradient(135deg, #4a1a2a, #2a0d18); }
+        .key-display { background: rgba(255, 252, 253, 0.95); padding: 15px; border-radius: 8px; margin-top: 15px; word-wrap: break-word; font-size: 12px; color: #4a1a2a; border: 1px solid rgba(114, 47, 74, 0.2); max-height: 200px; overflow-y: auto; font-family: 'Courier New', monospace; position: relative; }
+        input[type="text"], textarea { width: 100%; padding: 12px; margin: 10px 0; background: rgba(255, 252, 253, 0.95); border: 2px solid rgba(114, 47, 74, 0.3); border-radius: 8px; color: #4a1a2a; font-family: 'Georgia', serif; font-size: 14px; }
+        textarea { min-height: 100px; resize: vertical; font-family: 'Courier New', monospace; }
+        input[type="text"]:focus, textarea:focus { outline: none; border-color: #722f4a; box-shadow: 0 0 20px rgba(114, 47, 74, 0.3); }
+        input[type="text"]::placeholder, textarea::placeholder { color: rgba(74, 26, 42, 0.5); }
+        input[type="file"] { padding: 8px; background: rgba(255, 252, 253, 0.95); border: 2px solid rgba(114, 47, 74, 0.3); border-radius: 8px; color: #4a1a2a; font-family: 'Georgia', serif; cursor: pointer; width: 100%; }
+        nav { display: flex; align-items: center; justify-content: space-between; padding: 1rem 3rem; background: rgba(255, 248, 250, 0.95); box-shadow: 0 4px 20px rgba(100, 30, 50, 0.2); border-bottom: 2px solid rgba(114, 47, 74, 0.2); }
+        .logo { display: flex; align-items: center; gap: 0.5rem; font-size: 1.25rem; color: #722f4a; font-weight: bold; }
+        .nav-links { display: flex; gap: 1.5rem; align-items: center; list-style: none; }
+        .nav-links a { text-decoration: none; color: #4a1a2a; padding: 0.5rem 1.5rem; border-radius: 25px; transition: all 0.3s; font-family: 'Georgia', serif; }
+        .nav-links a.active { background: linear-gradient(135deg, #722f4a, #4a1a2a); color: white; }
+        .nav-links a:hover:not(.active) { background: rgba(114, 47, 74, 0.15); color: #722f4a; }
+        .copy-btn { position: absolute; top: 10px; right: 10px; padding: 5px 8px; font-size: 14px; background: linear-gradient(135deg, #722f4a, #4a1a2a); color: white; border: none; border-radius: 5px; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; }
+        .copy-btn:hover { transform: translateY(-1px); box-shadow: 0 3px 15px rgba(114, 47, 74, 0.4); }
+        .button-group { display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap; }
+        .upload-section { margin: 15px 0; padding: 15px; background: rgba(114, 47, 74, 0.1); border-radius: 8px; }
+        .signature-display { background: rgba(255, 252, 253, 0.95); padding: 15px; border-radius: 8px; margin-top: 15px; word-wrap: break-word; font-size: 12px; color: #4a1a2a; border: 1px solid rgba(114, 47, 74, 0.2); font-family: 'Courier New', monospace; position: relative; }
+        .verify-result { padding: 15px; margin-top: 15px; border-radius: 8px; font-weight: bold; text-align: center; }
+        .verify-result.success { background: rgba(76, 175, 80, 0.2); color: #2e7d32; border: 2px solid #4CAF50; }
+        .verify-result.error { background: rgba(244, 67, 54, 0.2); color: #c62828; border: 2px solid #f44336; }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: #f8f9fa;
-        }
-
-        nav {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 1rem 3rem;
-            background: white;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 1.25rem;
-            color: #0b5aa0;
-        }
-
-        .logo-icon {
-            width: 35px;
-            height: 35px;
-            border-radius: 70%;
-            object-fit: fit;
-        }
-
-
-        .nav-links {
-            display: flex;
-            gap: 2rem;
-            align-items: center;
-            list-style: none;
-        }
-
-        .nav-links a {
-            text-decoration: none;
-            color: #495057;
-            padding: 0.5rem 1.5rem;
-            border-radius: 25px;
-            transition: all 0.3s;
-        }
-
-        .nav-links a.active {
-            background: #4a90e2;
-            color: white;
-        }
-
-        .nav-links a:hover:not(.active) {
-            color: #4a90e2;
-        }
-
-        .nav-right {
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
-        }
-
-        .icon-btn {
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 1.25rem;
-            color: #495057;
-        }
-
-        .user-name {
-            color: #495057;
-        }
-
-        .contact-btn {
-            background: #4a90e2;
-            color: white;
-            border: none;
-            padding: 0.75rem 2rem;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: background 0.3s;
-        }
-
-        .contact-btn:hover {
-            background: #357abd;
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 3rem;
-        }
-
-        .page-title {
-            font-size: 3rem;
-            text-align: center;
-            color: #4a90e2;
-            margin-bottom: 3rem;
-            font-weight: 700;
-        }
-
-        .section {
-            margin-bottom: 3rem;
-        }
-
-        .section h2 {
-            font-size: 1.75rem;
-            color: #212529;
-            margin-bottom: 1.5rem;
-            font-weight: 700;
-        }
-
-        .btn {
-            background: #000;
-            color: white;
-            border: none;
-            padding: 1rem 2.5rem;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1.125rem;
-            font-weight: 500;
-            transition: background 0.3s;
-        }
-
-        .btn:hover {
-            background: #333;
-        }
-
-        .status-message {
-            margin-top: 1rem;
-            color: #28a745;
-            font-size: 1rem;
-        }
-
-        textarea {
-            width: 100%;
-            padding: 1.25rem;
-            border: 2px solid #dee2e6;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-family: inherit;
-            resize: vertical;
-            min-height: 120px;
-            background: white;
-            color: #495057;
-        }
-
-        textarea::placeholder {
-            color: #adb5bd;
-        }
-
-        textarea:focus {
-            outline: none;
-            border-color: #4a90e2;
-        }
-
-        .input-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .signature-label {
-            font-size: 2rem;
-            color: #212529;
-            margin: 2rem 0 1rem 0;
-            font-weight: 700;
-        }
-
-        footer {
-            background: #f1f3f5;
-            padding: 2rem;
-            text-align: center;
-            color: #6c757d;
-            margin-top: 4rem;
-        }
-
-        @media (max-width: 968px) {
-            nav {
-                padding: 1rem;
-            }
-
-            .nav-links {
-                gap: 1rem;
-            }
-
-            .page-title {
-                font-size: 2.5rem;
-            }
-
-            .section h2 {
-                font-size: 2rem;
-            }
-        }
-    </style>
+    
+   </style>
 </head>
 <body>
-    <nav>
-        <div class="logo">
-            <div class="logo-icon">
-                <img src="/static/ecc-logo.png" alt="Logo" class="logo-icon">
-            </div>
-            <span>ECDSA</span>
-        </div>
-        
-        <ul class="nav-links">
-            <li><a href="/">Home</a></li>
-            <li><a href="/p256">P-256</a></li>
-            <li><a href="/p384">P-384</a></li>
-            <li><a href="/p521" class="active">P-521</a></li>
-            <li><a href="/contact">Contact us</a></li>
-        </ul>
-        
-        <div class="nav-right">
-            <button class="icon-btn">🛒</button>
-            <button class="icon-btn">🔍</button>
-            <span class="user-name">Maram Shatila ▼</span>
-        </div>
-    </nav>
+<canvas id="encryption-canvas"></canvas>
 
+<nav>
+    <div class="logo"><span>🔐ECDSA</span></div>
+    <ul class="nav-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/about">About</a></li>
+        <li><a href="/learn">Learn</a></li>
+        <li><a href="/p256">P-256</a></li>
+        <li><a href="/p384">P-384</a></li>
+        <li><a href="/p521" class="active">P-521</a></li>
+        <li><a href="/contact">Contact us</a></li>
+    </ul>
+</nav>
+
+<div class="content">
     <div class="container">
-        <h1 class="page-title">ECDSA P-521 Curve</h1>
+        <h1>P-521 ECDSA Signature</h1>
 
-        <!-- Key Generation Section -->
-        <div class="section">
-            <h2>Key Generation</h2>
-            <button class="btn" id="generateKeys">Generate Keys</button>
-            <p class="status-message" id="keyStatus"></p>
+        <div class="key-section">
+            <h2>1. Generate Keys</h2>
+            <button onclick="generateKeys()">🔑 Generate P-521 Keys</button>
+            <div id="keys-display"></div>
         </div>
 
-        <!-- Sign Message Section -->
-        <div class="section">
-            <h2>Sign Message</h2>
-            <div class="input-group">
-                <textarea id="message" placeholder="Enter message to sign"></textarea>
-            </div>
-            <button class="btn" id="signMessage">Sign Message</button>
-            
-            <h2 class="signature-label">Signature:</h2>
-            <div class="input-group">
-                <textarea id="signatureResult" placeholder="Signature will appear here" readonly></textarea>
-            </div>
-        </div>
 
-        <!-- Verify Signature Section -->
-        <div class="section">
-            <h2>Verify Signature</h2>
-            <div class="input-group">
-                <textarea id="verifyMessage" placeholder="Enter original message"></textarea>
-            </div>
-            <div class="input-group">
-                <textarea id="signatureInput" placeholder="Enter signature"></textarea>
-            </div>
-            <button class="btn" id="verifySignature">Verify Signature</button>
-            <p class="status-message" id="verificationResult"></p>
-        </div>
+<div class="key-section">
+    <h2>2. Sign Message</h2>
+    <textarea id="message-input" placeholder="Enter message to sign.">Hello, ECDSA!</textarea>
+    <div class="upload-section">
+        <label for="pdf-upload-sign" style="display: block; margin-bottom: 10px; color: #4a1a2a; font-weight: bold;">
+            📄 Or upload a PDF file:
+        </label>
+        <input type="file" id="pdf-upload-sign" accept=".pdf" onchange="handlePDFUpload(event, 'message-input')">
     </div>
 
-    <footer>
-        Copyright © Company name
-    </footer>
+    <!-- Existing PEM private key -->
+    <textarea id="private-key-input" placeholder="Paste private key in PEM format." style="min-height: 150px;"></textarea>
 
-    <script>
-        document.getElementById("generateKeys").addEventListener("click", function() {
-            fetch('/generate_keys/p521')
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById("keyStatus").textContent = data.message;
-                });
+    <!-- NEW: raw private scalar (hex) -->
+    <div class="info-box">
+        <strong>Advanced:</strong> Or provide a raw private key scalar <code>d</code> in hex (for keys generated elsewhere).
+        <input type="text" id="private-scalar-hex"
+               placeholder="Private key scalar d (hex), e.g. 1f3a9c...">
+    </div>
+
+    <div class="info-box">
+        <strong>Advanced (educational):</strong> Optionally provide a nonce <code>k</code> in hex for ECDSA signing.
+        <input type="text" id="nonce-k-hex"
+           placeholder="Nonce k (hex). If empty, a default k is used.">
+        </div>
+
+    <div class="button-group">
+        <!-- This button will decide PEM vs scalar in JS -->
+        <button onclick="signMessage()">✍️ Sign Message</button>
+    </div>
+    <div id="signature-display"></div>
+</div>
+
+
+
+<div class="key-section">
+    <h2>3. Verify Signature</h2>
+    <textarea id="verify-message" placeholder="Enter message."></textarea>
+    <div class="upload-section">
+        <label for="pdf-upload-verify" style="display: block; margin-bottom: 10px; color: #4a1a2a; font-weight: bold;">
+            📄 Or upload a PDF file:
+        </label>
+        <input type="file" id="pdf-upload-verify" accept=".pdf" onchange="handlePDFUpload(event, 'verify-message')">
+    </div>
+
+    <!-- Existing PEM public key -->
+    <textarea id="public-key-input" placeholder="Paste public key in PEM format." style="min-height: 150px;"></textarea>
+
+    <!-- NEW: raw public point (x, y) -->
+    <div class="info-box">
+        <strong>Advanced:</strong> Or provide a raw public key point on P-521 (hex coordinates).
+        <input type="text" id="public-x-hex" placeholder="Public key X coordinate (hex)">
+        <input type="text" id="public-y-hex" placeholder="Public key Y coordinate (hex)">
+    </div>
+
+        <textarea id="verify-signature"
+              placeholder="Paste signature (hex if using advanced mode, or Base64 if using browser mode)."></textarea>
+
+    <button onclick="verifySignature()">✅ Verify Signature</button>
+    <div id="verify-result"></div>
+</div>
+
+    </div>
+</div>
+
+<script>
+    // Canvas animation
+    const canvas = document.getElementById('encryption-canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    // Animated Elliptic Curves
+    class EllipticCurve {
+        constructor() {
+            this.centerX = Math.random() * canvas.width;
+            this.centerY = Math.random() * canvas.height;
+            this.a = Math.random() * 80 + 60;
+            this.b = Math.random() * 120 + 80;
+            this.rotation = Math.random() * Math.PI * 2;
+            this.rotationSpeed = (Math.random() - 0.5) * 0.003;
+            this.opacity = Math.random() * 0.35 + 0.25;
+            this.speedX = (Math.random() - 0.5) * 0.3;
+            this.speedY = (Math.random() - 0.5) * 0.3;
+        }
+
+        update() {
+            this.rotation += this.rotationSpeed;
+            this.centerX += this.speedX;
+            this.centerY += this.speedY;
+
+            if (this.centerX < -100 || this.centerX > canvas.width + 100) this.speedX *= -1;
+            if (this.centerY < -100 || this.centerY > canvas.height + 100) this.speedY *= -1;
+        }
+
+        draw() {
+            ctx.save();
+            ctx.translate(this.centerX, this.centerY);
+            ctx.rotate(this.rotation);
+            ctx.strokeStyle = `rgba(220, 120, 150, ${this.opacity * 1.8})`;
+            ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            
+            for (let t = -Math.PI; t <= Math.PI; t += 0.05) {
+                const x = this.a * Math.cos(t);
+                const y = this.b * Math.sin(t) * Math.cos(t * 2);
+                if (t === -Math.PI) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            }
+            ctx.stroke();
+            ctx.restore();
+        }
+    }
+
+    // Point on curve with trail
+    class CurvePoint {
+        constructor(curve) {
+            this.curve = curve;
+            this.t = Math.random() * Math.PI * 2;
+            this.speed = (Math.random() * 0.02 + 0.01) * (Math.random() > 0.5 ? 1 : -1);
+            this.trail = [];
+            this.maxTrail = 30;
+            this.opacity = Math.random() * 0.5 + 0.3;
+        }
+
+        update() {
+            this.t += this.speed;
+            
+            const x = this.curve.centerX + this.curve.a * Math.cos(this.t) * Math.cos(this.curve.rotation) 
+                    - this.curve.b * Math.sin(this.t) * Math.cos(this.t * 2) * Math.sin(this.curve.rotation);
+            const y = this.curve.centerY + this.curve.a * Math.cos(this.t) * Math.sin(this.curve.rotation) 
+                    + this.curve.b * Math.sin(this.t) * Math.cos(this.t * 2) * Math.cos(this.curve.rotation);
+            
+            this.trail.unshift({ x, y });
+            if (this.trail.length > this.maxTrail) {
+                this.trail.pop();
+            }
+        }
+
+        draw() {
+            for (let i = 0; i < this.trail.length - 1; i++) {
+                const alpha = (1 - i / this.trail.length) * this.opacity * 1.5;
+                ctx.beginPath();
+                ctx.moveTo(this.trail[i].x, this.trail[i].y);
+                ctx.lineTo(this.trail[i + 1].x, this.trail[i + 1].y);
+                ctx.strokeStyle = `rgba(255, 180, 200, ${alpha})`;
+                ctx.lineWidth = 3;
+                ctx.stroke();
+            }
+
+            if (this.trail.length > 0) {
+                ctx.beginPath();
+                ctx.arc(this.trail[0].x, this.trail[0].y, 6, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 220, 230, ${this.opacity * 1.5})`;
+                ctx.fill();
+                
+                ctx.beginPath();
+                ctx.arc(this.trail[0].x, this.trail[0].y, 10, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 180, 200, ${this.opacity * 0.5})`;
+                ctx.fill();
+            }
+        }
+    }
+
+    // Signature visualization
+    class SignatureLink {
+        constructor() {
+            this.reset();
+        }
+
+        reset() {
+            this.x1 = Math.random() * canvas.width;
+            this.y1 = Math.random() * canvas.height;
+            this.x2 = this.x1 + (Math.random() - 0.5) * 200;
+            this.y2 = this.y1 + (Math.random() - 0.5) * 200;
+            this.progress = 0;
+            this.speed = Math.random() * 0.015 + 0.005;
+            this.opacity = Math.random() * 0.5 + 0.35;
+            this.lifespan = 0;
+            this.maxLife = Math.random() * 300 + 200;
+        }
+
+        update() {
+            this.progress += this.speed;
+            if (this.progress > 1) this.progress = 1;
+            
+            this.lifespan++;
+            if (this.lifespan > this.maxLife) {
+                this.reset();
+            }
+        }
+
+        draw() {
+            const fadeOut = this.lifespan > this.maxLife - 50 ? (this.maxLife - this.lifespan) / 50 : 1;
+            const currentOpacity = this.opacity * fadeOut;
+
+            ctx.beginPath();
+            ctx.arc(this.x1, this.y1, 8, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(240, 160, 180, ${currentOpacity})`;
+            ctx.fill();
+            
+            ctx.beginPath();
+            ctx.arc(this.x1, this.y1, 14, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(240, 160, 180, ${currentOpacity * 0.4})`;
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.arc(this.x2, this.y2, 8, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(240, 160, 180, ${currentOpacity * this.progress})`;
+            ctx.fill();
+
+            const currentX = this.x1 + (this.x2 - this.x1) * this.progress;
+            const currentY = this.y1 + (this.y2 - this.y1) * this.progress;
+
+            ctx.beginPath();
+            ctx.moveTo(this.x1, this.y1);
+            ctx.lineTo(currentX, currentY);
+            ctx.strokeStyle = `rgba(220, 140, 160, ${currentOpacity})`;
+            ctx.lineWidth = 2.5;
+            ctx.stroke();
+
+            if (this.progress > 0.5) {
+                ctx.font = 'bold 16px Georgia';
+                ctx.fillStyle = `rgba(255, 200, 220, ${currentOpacity})`;
+                ctx.fillText('r', this.x1 + 14, this.y1 - 14);
+                ctx.fillText('s', this.x2 + 14, this.y2 - 14);
+            }
+        }
+    }
+
+    // Floating mathematical symbols
+    class MathSymbol {
+        constructor() {
+            this.symbols = ['∑', '∏', '∫', '∂', '∇', '∞', 'π', 'λ', 'Δ', 'Ω', '≡', '⊕'];
+            this.symbol = this.symbols[Math.floor(Math.random() * this.symbols.length)];
+            this.x = Math.random() * canvas.width;
+            this.y = Math.random() * canvas.height;
+            this.size = Math.random() * 28 + 18;
+            this.speedX = (Math.random() - 0.5) * 0.4;
+            this.speedY = (Math.random() - 0.5) * 0.4;
+            this.opacity = Math.random() * 0.5 + 0.3;
+            this.rotation = Math.random() * 0.5 - 0.25;
+        }
+
+        update() {
+            this.x += this.speedX;
+            this.y += this.speedY;
+
+            if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+            if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+        }
+
+        draw() {
+            ctx.save();
+            ctx.translate(this.x, this.y);
+            ctx.rotate(this.rotation);
+            ctx.font = `bold ${this.size}px Georgia`;
+            ctx.fillStyle = `rgba(240, 180, 200, ${this.opacity})`;
+            ctx.fillText(this.symbol, 0, 0);
+            ctx.restore();
+        }
+    }
+
+    // Hash visualization
+    class HashCascade {
+        constructor() {
+            this.reset();
+        }
+
+        reset() {
+            this.x = Math.random() * canvas.width;
+            this.y = -30;
+            this.speed = Math.random() * 1 + 0.5;
+            this.hash = this.generateHash();
+            this.opacity = Math.random() * 0.6 + 0.35;
+        }
+
+        generateHash() {
+            const chars = '0123456789abcdef';
+            let hash = '';
+            for (let i = 0; i < 8; i++) {
+                hash += chars[Math.floor(Math.random() * chars.length)];
+            }
+            return hash;
+        }
+
+        update() {
+            this.y += this.speed;
+            if (this.y > canvas.height + 30) {
+                this.reset();
+            }
+            if (Math.random() < 0.03) {
+                this.hash = this.generateHash();
+            }
+        }
+
+        draw() {
+            ctx.font = 'bold 14px Courier New';
+            ctx.fillStyle = `rgba(230, 160, 180, ${this.opacity})`;
+            ctx.fillText(this.hash, this.x, this.y);
+        }
+    }
+
+    // Grid dots
+    class GridDot {
+        constructor(x, y) {
+            this.baseX = x;
+            this.baseY = y;
+            this.x = x;
+            this.y = y;
+            this.pulseOffset = Math.random() * Math.PI * 2;
+            this.pulseSpeed = Math.random() * 0.03 + 0.01;
+        }
+
+        update(time) {
+            const pulse = Math.sin(time * this.pulseSpeed + this.pulseOffset);
+            this.size = 2.5 + pulse * 1.2;
+            this.opacity = 0.3 + pulse * 0.2;
+        }
+
+        draw() {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(200, 140, 160, ${this.opacity})`;
+            ctx.fill();
+        }
+    }
+
+    // Initialize elements
+    const curves = [];
+    for (let i = 0; i < 6; i++) {
+        curves.push(new EllipticCurve());
+    }
+
+    const points = [];
+    curves.forEach(curve => {
+        for (let i = 0; i < 2; i++) {
+            points.push(new CurvePoint(curve));
+        }
+    });
+
+    const signatures = [];
+    for (let i = 0; i < 8; i++) {
+        const sig = new SignatureLink();
+        sig.lifespan = Math.random() * sig.maxLife;
+        signatures.push(sig);
+    }
+
+    const symbols = [];
+    for (let i = 0; i < 25; i++) {
+        symbols.push(new MathSymbol());
+    }
+
+    const hashes = [];
+    for (let i = 0; i < 20; i++) {
+        const hash = new HashCascade();
+        hash.y = Math.random() * canvas.height;
+        hashes.push(hash);
+    }
+
+    const gridDots = [];
+    const spacing = 60;
+    for (let x = 0; x < canvas.width + spacing; x += spacing) {
+        for (let y = 0; y < canvas.height + spacing; y += spacing) {
+            gridDots.push(new GridDot(x, y));
+        }
+    }
+
+    let time = 0;
+
+    function animate() {
+        ctx.fillStyle = 'rgba(21, 8, 16, 0.15)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        gridDots.forEach(dot => {
+            dot.update(time);
+            dot.draw();
         });
 
-        document.getElementById("signMessage").addEventListener("click", function() {
-            const message = document.getElementById("message").value;
+        curves.forEach(curve => {
+            curve.update();
+            curve.draw();
+        });
+
+        points.forEach(point => {
+            point.update();
+            point.draw();
+        });
+
+        signatures.forEach(sig => {
+            sig.update();
+            sig.draw();
+        });
+
+        symbols.forEach(symbol => {
+            symbol.update();
+            symbol.draw();
+        });
+
+        hashes.forEach(hash => {
+            hash.update();
+            hash.draw();
+        });
+
+        time++;
+        requestAnimationFrame(animate);
+    }
+
+    animate();
+
+    window.addEventListener('resize', () => {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    });
+
+    // Helper functions
+    function copyToClipboard(text, btn) {
+        navigator.clipboard.writeText(text).then(() => {
+            btn.textContent = '✅';
+            btn.style.background = '#4CAF50';
+            setTimeout(() => { 
+                btn.textContent = '📋'; 
+                btn.style.background = 'linear-gradient(135deg, #722f4a, #4a1a2a)'; 
+            }, 2000);
+        }).catch(err => console.error('Failed to copy:', err));
+    }
+
+    function exportToFile(content, filename) {
+        const blob = new Blob([content], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+
+    async function handlePDFUpload(event, targetId) {
+        const file = event.target.files[0];
+        if (!file) return;
+        try {
+            const arrayBuffer = await file.arrayBuffer();
+            const uint8Array = new Uint8Array(arrayBuffer);
+            let text = '';
+            for (let i = 0; i < uint8Array.length; i++) {
+                const char = String.fromCharCode(uint8Array[i]);
+                if (char.match(/[\x20-\x7E\n\r]/)) text += char;
+            }
+            text = text.replace(/[\x00-\x1F\x7F-\x9F]/g, ' ').replace(/\s+/g, ' ').trim();
+            if (text.length > 0) document.getElementById(targetId).value = text;
+        } catch (error) { 
+            console.error('Error reading PDF:', error); 
+        }
+    }
+
+    // Crypto helper functions
+    function arrayBufferToBase64(buffer) {
+        let binary = '';
+        const bytes = new Uint8Array(buffer);
+        for (let i = 0; i < bytes.byteLength; i++) {
+            binary += String.fromCharCode(bytes[i]);
+        }
+        return btoa(binary);
+    }
+
+    function base64ToArrayBuffer(base64) {
+        const binaryString = atob(base64);
+        const bytes = new Uint8Array(binaryString.length);
+        for (let i = 0; i < binaryString.length; i++) {
+            bytes[i] = binaryString.charCodeAt(i);
+        }
+        return bytes.buffer;
+    }
+
+    function spkiToPem(arrayBuffer) {
+        const base64 = arrayBufferToBase64(arrayBuffer);
+        let pem = '-----BEGIN PUBLIC KEY-----\n';
+        for (let i = 0; i < base64.length; i += 64) {
+            pem += base64.slice(i, i + 64) + '\n';
+        }
+        pem += '-----END PUBLIC KEY-----';
+        return pem;
+    }
+
+    function pkcs8ToPem(arrayBuffer) {
+        const base64 = arrayBufferToBase64(arrayBuffer);
+        let pem = '-----BEGIN PRIVATE KEY-----\n';
+        for (let i = 0; i < base64.length; i += 64) {
+            pem += base64.slice(i, i + 64) + '\n';
+        }
+        pem += '-----END PRIVATE KEY-----';
+        return pem;
+    }
+
+    function pemToArrayBuffer(pem) {
+        const base64 = pem
+            .replace(/-----BEGIN [A-Z ]+-----/, '')
+            .replace(/-----END [A-Z ]+-----/, '')
+            .replace(/\s/g, '');
+        return base64ToArrayBuffer(base64);
+    }
+
+    // Main functions
+    async function generateKeys() {
+        try {
+            const keyPair = await window.crypto.subtle.generateKey(
+                {
+                    name: "ECDSA",
+                    namedCurve: "P-521"
+                },
+                true,
+                ["sign", "verify"]
+            );
+
+            const privateKeyBuffer = await window.crypto.subtle.exportKey("pkcs8", keyPair.privateKey);
+            const publicKeyBuffer = await window.crypto.subtle.exportKey("spki", keyPair.publicKey);
+
+            const privateKeyPem = pkcs8ToPem(privateKeyBuffer);
+            const publicKeyPem = spkiToPem(publicKeyBuffer);
+
+            document.getElementById('keys-display').innerHTML = `
+                <div class="key-display">
+                    <button class="copy-btn" onclick="copyToClipboard(\`${privateKeyPem}\`, this)">📋</button>
+                    <strong>Private Key (PEM):</strong><br><pre>${privateKeyPem}</pre>
+                </div>
+                <div class="key-display">
+                    <button class="copy-btn" onclick="copyToClipboard(\`${publicKeyPem}\`, this)">📋</button>
+                    <strong>Public Key (PEM):</strong><br><pre>${publicKeyPem}</pre>
+                </div>
+                <div class="button-group">
+                    <button onclick="exportToFile(\`${privateKeyPem}\`, 'private_key_p521.pem')">💾 Export Private Key</button>
+                    <button onclick="exportToFile(\`${publicKeyPem}\`, 'public_key_p521.pem')">💾 Export Public Key</button>
+                </div>
+            `;
+
+            document.getElementById('private-key-input').value = privateKeyPem;
+            document.getElementById('public-key-input').value = publicKeyPem;
+
+        } catch (error) {
+            document.getElementById('keys-display').innerHTML = `
+                <div class="verify-result error">❌ Error: ${error.message}</div>
+            `;
+        }
+    }
+
+
+async function signMessage() {
+        try {
+            const message = document.getElementById('message-input').value;
+            const privateKeyPem = document.getElementById('private-key-input').value.trim();
+            const privateScalarHex = document.getElementById('private-scalar-hex').value.trim();
 
             if (!message) {
-                alert("Please enter a message.");
+                throw new Error('Please provide a message');
+            }
+
+            // -------- Mode 1: Browser / WebCrypto with PEM (P-521, SHA-512) --------
+            if (privateKeyPem && !privateScalarHex) {
+                const privateKeyBuffer = pemToArrayBuffer(privateKeyPem);
+                const privateKey = await window.crypto.subtle.importKey(
+                    "pkcs8",
+                    privateKeyBuffer,
+                    {
+                        name: "ECDSA",
+                        namedCurve: "P-521"
+                    },
+                    false,
+                    ["sign"]
+                );
+
+                const encoder = new TextEncoder();
+                const data = encoder.encode(message);
+
+                const signature = await window.crypto.subtle.sign(
+                    {
+                        name: "ECDSA",
+                        hash: { name: "SHA-512" }
+                    },
+                    privateKey,
+                    data
+                );
+
+                const signatureBase64 = btoa(String.fromCharCode(...new Uint8Array(signature)));
+
+                document.getElementById('signature-display').innerHTML = `
+                    <div class="signature-display">
+                        <button class="copy-btn" onclick="copyToClipboard(\`${signatureBase64}\`, this)">📋</button>
+                        <strong>✅ Message signed successfully (browser / PEM, P-521)!</strong><br><br>
+                        <strong>Signature (Base64):</strong><br>${signatureBase64}
+                    </div>
+                    <div class="button-group">
+                        <button onclick="exportToFile(\`${signatureBase64}\`, 'signature_p521_base64.txt')">💾 Export Signature</button>
+                    </div>
+                `;
+
+                document.getElementById('verify-message').value = message;
+                document.getElementById('verify-signature').value = signatureBase64;
                 return;
             }
 
-            fetch('/sign_message/p521', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message })
-            })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById("signatureResult").value = data.signature;
-            });
-        });
+            // -------- Mode 2: Server / raw scalar d (hex) --------
+            if (privateScalarHex) {
+                const resp = await fetch('/sign_message/p521', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: message,
+                        private_scalar_hex: privateScalarHex
+                    })
+                });
 
-        document.getElementById("verifySignature").addEventListener("click", function() {
-            const message = document.getElementById("verifyMessage").value;
-            const signature = document.getElementById("signatureInput").value;
+                const data = await resp.json();
+                if (!resp.ok) {
+                    throw new Error(data.error || 'Server signing failed');
+                }
 
-            if (!message || !signature) {
-                alert("Please enter both message and signature.");
+                const signatureHex = data.signature_hex;
+
+                document.getElementById('signature-display').innerHTML = `
+                    <div class="signature-display">
+                        <button class="copy-btn" onclick="copyToClipboard(\`${signatureHex}\`, this)">📋</button>
+                        <strong>✅ Message signed successfully (server / raw scalar, P-521)!</strong><br><br>
+                        <strong>Signature (hex):</strong><br>${signatureHex}
+                    </div>
+                    <div class="button-group">
+                        <button onclick="exportToFile(\`${signatureHex}\`, 'signature_p521_hex.txt')">💾 Export Signature</button>
+                    </div>
+                `;
+
+                document.getElementById('verify-message').value = message;
+                document.getElementById('verify-signature').value = signatureHex;
                 return;
             }
 
-            fetch('/verify_signature/p521', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message, signature })
-            })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById("verificationResult").textContent = data.message;
-            });
-        });
-    </script>
+            throw new Error('Please provide either a PEM private key or a private scalar d (hex)');
+
+        } catch (error) {
+            document.getElementById('signature-display').innerHTML = `
+                <div class="verify-result error">❌ Error: ${error.message}</div>
+            `;
+        }
+    }
+
+    async function verifySignature() {
+        try {
+            const message = document.getElementById('verify-message').value;
+            const publicKeyPem = document.getElementById('public-key-input').value.trim();
+            const publicXHex = document.getElementById('public-x-hex').value.trim();
+            const publicYHex = document.getElementById('public-y-hex').value.trim();
+            const signatureInput = document.getElementById('verify-signature').value.trim();
+
+            if (!message || !signatureInput) {
+                throw new Error('Please provide message and signature');
+            }
+
+            // -------- Mode 1: Browser / WebCrypto with PEM (Base64 signature, P-521) --------
+            if (publicKeyPem && !publicXHex && !publicYHex) {
+                const publicKeyBuffer = pemToArrayBuffer(publicKeyPem);
+                const publicKey = await window.crypto.subtle.importKey(
+                    "spki",
+                    publicKeyBuffer,
+                    {
+                        name: "ECDSA",
+                        namedCurve: "P-521"
+                    },
+                    false,
+                    ["verify"]
+                );
+
+                const signatureBytes = Uint8Array.from(atob(signatureInput), c => c.charCodeAt(0));
+                const encoder = new TextEncoder();
+                const data = encoder.encode(message);
+
+                const isValid = await window.crypto.subtle.verify(
+                    {
+                        name: "ECDSA",
+                        hash: { name: "SHA-512" }
+                    },
+                    publicKey,
+                    signatureBytes,
+                    data
+                );
+
+                document.getElementById('verify-result').innerHTML = `
+                    <div class="verify-result ${isValid ? 'success' : 'error'}">
+                        ${isValid ? '✅ Signature is VALID (browser / PEM, P-521)' : '❌ Signature is INVALID (browser / PEM, P-521)'}
+                    </div>
+                `;
+                return;
+            }
+
+            // -------- Mode 2: Server / raw public point (X, Y) with hex signature --------
+            if (publicXHex && publicYHex) {
+                const resp = await fetch('/verify_signature/p521', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: message,
+                        signature_hex: signatureInput,
+                        public_x_hex: publicXHex,
+                        public_y_hex: publicYHex
+                    })
+                });
+
+                const data = await resp.json();
+                if (!resp.ok) {
+                    throw new Error(data.error || 'Server verification failed');
+                }
+
+                document.getElementById('verify-result').innerHTML = `
+                    <div class="verify-result ${data.valid ? 'success' : 'error'}">
+                        ${data.valid ? '✅ Signature is VALID (server / raw point, P-521)' : '❌ Signature is INVALID (server / raw point, P-521)'}
+                    </div>
+                `;
+                return;
+            }
+
+            throw new Error('Please provide either a PEM public key OR both X and Y hex coordinates');
+
+        } catch (error) {
+            document.getElementById('verify-result').innerHTML = `
+                <div class="verify-result error">❌ Error: ${error.message}</div>
+            `;
+        }
+    }
+
+</script>
+</script>
 </body>
 </html>

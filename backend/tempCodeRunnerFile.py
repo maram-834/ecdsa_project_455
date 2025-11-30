@@ -1,6 +1,5 @@
 from flask import Flask, render_template, request, jsonify
 from ecdsa import SigningKey, VerifyingKey, NIST384p, NIST256p, NIST521p, ellipticcurve
-from ecdsa.util import sigencode_der, sigencode_string
 import hashlib
 import os
 from flask_cors import CORS
@@ -23,6 +22,7 @@ def get_curve_obj(curve_name):
         return NIST384p
     elif curve_name == 'p521':
         return NIST521p
+    # default to P-384 if something weird is passed
     return NIST384p
 
 # ------------------------- KEY GENERATION -------------------------
@@ -39,64 +39,37 @@ def generate_keys(curve):
 
     public_key = private_key.get_verifying_key()
 
-# ------------------------- SIGNING (PEM OR RAW d, OPTIONAL k) -------------------------
-def sign_message(curve_name, message, private_key_pem=None, private_scalar_hex=None, nonce_k_hex=None):
+# ------------------------- SIGNING (PEM OR RAW SCALAR) -------------------------
+def sign_message(curve_name, message, private_key_pem=None, private_scalar_hex=None):
     if not message:
         return None
 
     try:
         curve_obj = get_curve_obj(curve_name)
+
+        if private_key_pem:
+            # Load the private key from PEM
+            private_key = SigningKey.from_pem(private_key_pem)
+        elif private_scalar_hex:
+            # Build key from raw scalar d (hex)
+            secexp = int(private_scalar_hex, 16)
+            private_key = SigningKey.from_secret_exponent(secexp, curve=curve_obj)
+        else:
+            # Nothing provided
+            return None
+
+        # Hash the message (you already used sha256 everywhere before)
         msg_hash = hashlib.sha256(message.encode()).digest()
 
-        # --- Case 1: PEM private key (old behavior) ---
-        if private_key_pem and not private_scalar_hex and not nonce_k_hex:
-            sk = SigningKey.from_pem(private_key_pem)
-            sig_bytes = sk.sign(msg_hash)  # DER-encoded by default
-            return sig_bytes.hex()
+        # Sign the hash – returns raw bytes
+        signature = private_key.sign(msg_hash)
 
-        # --- Case 2: scalar d (raw private key), no custom k -> use library sign ---
-        if private_scalar_hex and not nonce_k_hex:
-            d = int(private_scalar_hex, 16)
-            sk = SigningKey.from_secret_exponent(d, curve=curve_obj)
-            sig_bytes = sk.sign(msg_hash)  # DER-encoded
-            return sig_bytes.hex()
-
-        # --- Case 3: scalar d AND nonce k (educational mode) ---
-        if private_scalar_hex and nonce_k_hex:
-            curve = curve_obj
-            G = curve.generator
-            n = curve.order
-
-            d = int(private_scalar_hex, 16) % n
-            k = int(nonce_k_hex, 16) % n
-            if k == 0:
-                raise ValueError("k must not be 0 modulo n")
-
-            # r = (k*G).x mod n
-            P = k * G
-            r = P.x() % n
-            if r == 0:
-                raise ValueError("r ended up zero, choose a different k")
-
-            h = int.from_bytes(hashlib.sha1(msg_hash).digest(), 'big')
-
-            # s = k^-1 (h + d*r) mod n
-            k_inv = pow(k, -1, n)
-            s = (k_inv * (h + d * r)) % n
-            if s == 0:
-                raise ValueError("s ended up zero, choose a different k")
-
-            # Encode (r, s) in the same raw format that verify() expects (r||s)
-            sig_bytes = sigencode_string(r, s, n)
-            return sig_bytes.hex()
-
-        # If we got here, we didn't have enough info
-        return None
+        # Return hex so it's easy to copy/paste
+        return signature.hex()
 
     except Exception as e:
         print("Signing error:", e)
         return None
-
 
 # ------------------------- VERIFY SIGNATURE (PEM OR RAW POINT) -------------------------
 def verify_signature(curve_name, message, signature_hex,
@@ -117,28 +90,27 @@ def verify_signature(curve_name, message, signature_hex,
             # Validate that the point lies on the curve
             if not curve_obj.curve.contains_point(x, y):
                 print("Point is NOT on the curve")
-                return False, "point_not_on_curve"
+                return False
 
             point = ellipticcurve.Point(curve_obj.curve, x, y)
             public_key = VerifyingKey.from_public_point(point, curve=curve_obj)
         else:
-            # use stored public key file if present
+            # Fallback: use stored public key file if present
             key_folder = os.path.join(os.getcwd(), "keys")
             public_key_path = os.path.join(key_folder, "public_key.pem")
             if not os.path.exists(public_key_path):
-                return False, "no_public_key_available"
+                return False
             with open(public_key_path, "r") as f:
                 public_key = VerifyingKey.from_pem(f.read())
 
         msg_hash = hashlib.sha256(message.encode()).digest()
         signature = bytes.fromhex(signature_hex)
 
-        ok = public_key.verify(signature, msg_hash)
-        return ok, "ok" if ok else "bad_signature"
+        return public_key.verify(signature, msg_hash)
 
     except Exception as e:
         print("Error during signature verification:", e)
-        return False, "error"
+        return False
 
 
 
@@ -166,9 +138,6 @@ def about():
 @app.route('/contact')
 def contact():
     return render_template('contact.html')
-@app.route('/learn')
-def learn():
-    return render_template('learn.html')
 
 
 @app.route('/generate_keys/<curve>', methods=['GET'])
@@ -185,9 +154,8 @@ def generate_keys_route(curve):
 def sign_message_route(curve):
     data = request.json or {}
     message = data.get('message')
-    private_key_pem = data.get('private_key')          # optional PEM
-    private_scalar_hex = data.get('private_scalar_hex')  # optional d
-    nonce_k_hex = data.get('nonce_k_hex')               # optional k
+    private_key_pem = data.get('private_key')          # PEM option
+    private_scalar_hex = data.get('private_scalar_hex')  # raw scalar option
 
     if not message:
         return jsonify({"error": "Message is missing"}), 400
@@ -195,18 +163,13 @@ def sign_message_route(curve):
     if not private_key_pem and not private_scalar_hex:
         return jsonify({"error": "Provide either private_key (PEM) or private_scalar_hex"}), 400
 
-    sig_hex = sign_message(
-        curve,
-        message,
-        private_key_pem=private_key_pem,
-        private_scalar_hex=private_scalar_hex,
-        nonce_k_hex=nonce_k_hex
-    )
-    if not sig_hex:
+    signature_hex = sign_message(curve, message,
+                                 private_key_pem=private_key_pem,
+                                 private_scalar_hex=private_scalar_hex)
+    if not signature_hex:
         return jsonify({"error": "Signing failed"}), 400
 
-    return jsonify({"signature_hex": sig_hex})
-
+    return jsonify({"signature_hex": signature_hex})
 
 
 
@@ -225,7 +188,7 @@ def verify_signature_route(curve):
     if not public_key_pem and not (public_x_hex and public_y_hex):
         return jsonify({'error': 'Provide either public_key (PEM) or (public_x_hex, public_y_hex)'}), 400
 
-    is_valid, reason = verify_signature(
+    is_valid = verify_signature(
         curve,
         message,
         signature_hex,
@@ -236,14 +199,7 @@ def verify_signature_route(curve):
 
     return jsonify({
         'valid': is_valid,
-        'reason': reason,
-        'message': (
-            'Signature is valid!'
-            if is_valid else
-            ('Public point is not on the curve'
-             if reason == 'point_not_on_curve'
-             else 'Signature is invalid!')
-        )
+        'message': 'Signature is valid!' if is_valid else 'Signature is invalid!'
     })
 
 
